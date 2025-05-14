@@ -4,6 +4,9 @@ import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
+import Dataset from './pages/Dataset';
+import Api from './pages/Api';
+
 
 const App = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
@@ -24,8 +27,10 @@ const App = () => {
       <Router>
         <Navbar toggleTheme={toggleTheme} />
         <Routes> {/* Remplace Switch par Routes */}
-          <Route exact path="/" element={<Home />} /> {/* Remplace component par element */}
-          <Route path="/dashboard" element={<Dashboard />} /> {/* Remplace component par element */}
+          <Route exact path="/" element={<Home />} /> 
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dataset" element={<Dataset />} /> 
+          <Route path="/api" element={<Api />} />
         </Routes>
       </Router>
     </ThemeProvider>

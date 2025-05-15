@@ -3,6 +3,7 @@ import { Box, Container, Grid, Paper } from '@mui/material';
 import LineChart from '../components/LineChart';
 import BarChart from '../components/BarChart';
 import PieChart from '../components/PieChart';
+import PieChart2 from '../components/PieChart2';
 
 const Dashboard = () => {
   return (
@@ -24,7 +25,13 @@ const Dashboard = () => {
               <PieChart />
             </Paper>
           </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 2 }}>
+              <PieChart2 /> {/* Nouveau camembert Monkeypox */}
+            </Paper>
+          </Grid>
         </Grid>
+        
       </Container>
     </Box>
   );

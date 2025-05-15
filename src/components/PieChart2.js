@@ -45,7 +45,7 @@ const PieChart = () => {
 
   return (
     <div>
-      <h2>Pays les plus touchés par le Monkeypox</h2>
+      <h3>Pays les plus touchés par le Monkeypox</h3>
       <div style={{ width: '300px', height: '300px' }}>
         <Pie data={chartData} options={options} />
       </div>

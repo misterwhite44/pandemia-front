@@ -7,9 +7,12 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const PieChart = () => {
   const [chartData, setChartData] = useState(null);
 
+  const options = {
+    maintainAspectRatio: false,
+  };
+
   useEffect(() => {
     fetch('http://localhost:8080/globaldata')
-
       .then((res) => res.json())
       .then((data) => {
         if (!Array.isArray(data)) {
@@ -20,7 +23,7 @@ const PieChart = () => {
         const filteredData = data
           .filter((entry) => entry.disease.name === 'COVID-19' && entry.totalCases)
           .sort((a, b) => b.totalCases - a.totalCases)
-          .slice(0, 5); // Top 5 pays les plus contaminés
+          .slice(0, 5);
 
         const labels = filteredData.map((entry) => entry.country.name);
         const values = filteredData.map((entry) => entry.totalCases);
@@ -40,7 +43,14 @@ const PieChart = () => {
 
   if (!chartData) return <p>Chargement des données...</p>;
 
-  return <Pie data={chartData} />;
+  return (
+    <div>
+      <h2>Pays les plus touchés par le Covid-19</h2>
+      <div style={{ width: '300px', height: '300px' }}>
+        <Pie data={chartData} options={options} />
+      </div>
+    </div>
+  );
 };
 
 export default PieChart;

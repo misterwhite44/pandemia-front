@@ -15,7 +15,6 @@ const countryCoords = {
   Armenia: [40.069099, 45.038189],
   Australia: [-25.274398, 133.775136],
   Austria: [47.516231, 14.550072],
-  // ajoute d'autres pays si besoin
 };
 
 const GlobalDiseaseMap = () => {

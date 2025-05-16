@@ -1,8 +1,10 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, IconButton, Box } from '@mui/material';
-import { Link } from 'react-router-dom'; // Pour la navigation
-import Brightness7Icon from '@mui/icons-material/Brightness7'; // Icône du mode clair
-import Brightness4Icon from '@mui/icons-material/Brightness4'; // Icône du mode sombre
+import { Link } from 'react-router-dom'; 
+import Brightness7Icon from '@mui/icons-material/Brightness7'; 
+import Brightness4Icon from '@mui/icons-material/Brightness4'; 
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import PublicIcon from '@mui/icons-material/Public';
 
 const Navbar = ({ toggleTheme }) => {
   return (
@@ -12,7 +14,6 @@ const Navbar = ({ toggleTheme }) => {
           Mon Application
         </Typography>
 
-        {/* Liens de navigation */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Link to="/" style={{ textDecoration: 'none', color: 'white', marginRight: '20px' }}>
             <Typography variant="body1">Accueil</Typography>
@@ -20,8 +21,26 @@ const Navbar = ({ toggleTheme }) => {
           <Link to="/dashboard" style={{ textDecoration: 'none', color: 'white', marginRight: '20px' }}>
             <Typography variant="body1">Dashboard</Typography>
           </Link>
+          <Link to="/dataset" style={{ textDecoration: 'none', color: 'white', marginRight: '20px' }}>
+            <Typography variant="body1">Dataset</Typography>
+          </Link>
+          <Link to="/api" style={{ textDecoration: 'none', color: 'white', marginRight: '20px' }}>
+            <Typography variant="body1">API</Typography>
+          </Link>
 
-          {/* Switch pour changer le mode */}
+          {/* Icône monde vers la page /map */}
+          <Link to="/map" style={{ color: 'white', marginRight: '20px' }}>
+            <IconButton sx={{ color: 'inherit' }}>
+              <PublicIcon />
+            </IconButton>
+          </Link>
+
+          <Link to="/profile" style={{ color: 'white', marginRight: '20px' }}>
+            <IconButton sx={{ color: 'inherit' }}>
+              <AccountCircleIcon />
+            </IconButton>
+          </Link>
+
           <IconButton sx={{ color: 'inherit' }} onClick={toggleTheme}>
             {document.body.style.backgroundColor === 'rgb(0, 0, 0)' ? (
               <Brightness7Icon />

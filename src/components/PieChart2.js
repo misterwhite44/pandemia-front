@@ -21,7 +21,7 @@ const PieChart = () => {
         }
 
         const filteredData = data
-          .filter((entry) => entry.disease.name === 'COVID-19' && entry.totalCases)
+          .filter((entry) => entry.disease.name === 'Monkeypox' && entry.totalCases)
           .sort((a, b) => b.totalCases - a.totalCases)
           .slice(0, 5);
 
@@ -45,7 +45,7 @@ const PieChart = () => {
 
   return (
     <div>
-      <h3>Pays les plus touchés par le Covid-19</h3>
+      <h3>Pays les plus touchés par le Monkeypox</h3>
       <div style={{ width: '300px', height: '300px' }}>
         <Pie data={chartData} options={options} />
       </div>

@@ -5,6 +5,7 @@ import PieChart from '../components/PieChart';
 import PieChart2 from '../components/PieChart2';
 import TotalDeathsChart from '../components/TotalDeathsChart';
 import TotalRecoveredChart from '../components/TotalRecoveredChart';
+import DailyCasesChart from '../components/DailyCasesChart';
 
 const Dashboard = () => {
   return (
@@ -36,13 +37,21 @@ const Dashboard = () => {
               </Paper>
             </Grid>
           </Grid>
-        </Grid>
-        <Grid item xs={12} md={12}>
-  <Paper sx={{ p: 2 }}>
-    <TotalRecoveredChart />
-  </Paper>
-</Grid>
 
+          {/* Mettre TotalRecoveredChart et DailyCasesChart côte à côte */}
+          <Grid container item xs={12} spacing={2}>
+            <Grid item xs={6}>
+              <Paper sx={{ p: 2 }}>
+                <TotalRecoveredChart />
+              </Paper>
+            </Grid>
+            <Grid item xs={6}>
+              <Paper sx={{ p: 2 }}>
+                <DailyCasesChart />
+              </Paper>
+            </Grid>
+          </Grid>
+        </Grid>
       </Container>
     </Box>
   );

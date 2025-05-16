@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend } from 'chart.js';
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 
@@ -23,7 +31,7 @@ const BarChart = () => {
           const continent = entry.country?.continent?.name;
           const cases = entry.totalCases;
 
-          if (disease === 'Covid-19' && continent && cases) {
+          if (disease === 'COVID-19' && continent && cases) {
             continentTotals[continent] = (continentTotals[continent] || 0) + cases;
           }
         });
@@ -35,19 +43,47 @@ const BarChart = () => {
           labels,
           datasets: [
             {
-              label: 'Total des cas Covid-19 par continent',
+              label: 'Total des cas COVID-19 par continent',
               data: values,
-              backgroundColor: '#f57c00',
-            },
-          ],
+              backgroundColor: '#42a5f5'
+            }
+          ]
         });
       })
       .catch((err) => console.error('Erreur lors du fetch :', err));
   }, []);
 
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: 'Cas COVID-19 par continent'
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          autoSkip: false,
+          maxRotation: 45,
+          minRotation: 30
+        }
+      },
+      y: {
+        beginAtZero: true
+      }
+    }
+  };
+
   if (!chartData) return <p>Chargement des données...</p>;
 
-  return <Bar data={chartData} />;
+  return (
+    <div style={{ height: '400px' }}>
+      <Bar data={chartData} options={options} />
+    </div>
+  );
 };
 
 export default BarChart;

@@ -1,12 +1,15 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, IconButton, Box } from '@mui/material';
-import { Link } from 'react-router-dom'; 
+import { Link, useLocation } from 'react-router-dom'; 
 import Brightness7Icon from '@mui/icons-material/Brightness7'; 
 import Brightness4Icon from '@mui/icons-material/Brightness4'; 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import PublicIcon from '@mui/icons-material/Public';
+import MemoryIcon from '@mui/icons-material/Memory';
 
 const Navbar = ({ toggleTheme }) => {
+  const location = useLocation();
+
   return (
     <AppBar position="sticky">
       <Toolbar>
@@ -28,10 +31,16 @@ const Navbar = ({ toggleTheme }) => {
             <Typography variant="body1">API</Typography>
           </Link>
 
-          {/* Icône monde vers la page /map */}
           <Link to="/map" style={{ color: 'white', marginRight: '20px' }}>
             <IconButton sx={{ color: 'inherit' }}>
               <PublicIcon />
+            </IconButton>
+          </Link>
+
+          {/* Lien vers IA avec icône */}
+          <Link to="/ia" style={{ color: 'white', marginRight: '20px' }}>
+            <IconButton sx={{ color: 'inherit' }}>
+              <MemoryIcon />
             </IconButton>
           </Link>
 

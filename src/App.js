@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Dataset from './pages/Dataset';
 import Api from './pages/Api';
 import GlobalDiseaseMapPage from './pages/GlobalDiseaseMapPage';
+import Ia from './pages/Ia'; 
 
 
 const App = () => {
@@ -33,6 +34,7 @@ const App = () => {
           <Route path="/dataset" element={<Dataset />} /> 
           <Route path="/api" element={<Api />} />
           <Route path="/map" element={<GlobalDiseaseMapPage />} />
+          <Route path="/ia" element={<Ia />} /> 
         </Routes>
       </Router>
     </ThemeProvider>

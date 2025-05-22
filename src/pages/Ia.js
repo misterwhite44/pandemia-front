@@ -1,40 +1,62 @@
-import React, { useState } from 'react';
-import { Box, Container, Paper, Typography, Button } from '@mui/material';
+import React, { useState } from "react";
 
-const Ia = () => {
-  const [prediction, setPrediction] = useState(null);
+function PredictionComponent() {
+  const [resultText, setResultText] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [error, setError] = useState(null);
 
-  const handlePredict = () => {
-    const randomValue = Math.random();
-    let result = 'Risque faible';
-    if (randomValue > 0.7) result = 'Risque élevé';
-    else if (randomValue > 0.4) result = 'Risque moyen';
+  const handlePrediction = () => {
+    fetch("http://localhost:8000/api/v1/predict?target=new_cases&country_name=France&days_ahead=7")
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Erreur HTTP");
+        }
+        return res.json();
+      })
+      .then(data => {
+        console.log("Réponse IA :", data);
 
-    setPrediction(result);
+        if (data.image_path) {
+          setImageUrl(`http://localhost:8000/${data.image_path}`);
+        } else {
+          setImageUrl(null);
+        }
+
+        setResultText(JSON.stringify(data.prediction || data, null, 2));
+        setError(null);
+      })
+      .catch(err => {
+        console.error(err);
+        setError("Erreur lors de la récupération de la prédiction.");
+        setResultText(null);
+        setImageUrl(null);
+      });
   };
 
   return (
-    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 4 }}>
-      <Container maxWidth="sm">
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
-          <Typography variant="h4" gutterBottom>
-            Prédiction IA
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 3 }}>
-            Clique sur le bouton pour lancer une prédiction.
-          </Typography>
-          <Button variant="contained" onClick={handlePredict}>
-            Lancer la prédiction
-          </Button>
-          {prediction && (
-            <Typography variant="h6" sx={{ mt: 3 }}>
-              Résultat : {prediction}
-            </Typography>
-          )}
-        </Paper>
-      </Container>
-    </Box>
-  );
-};
+    <div style={{ backgroundColor: "white", color: "black", padding: "1rem", minHeight: "100vh" }}>
+      <h2>Prédiction IA</h2>
+      <button onClick={handlePrediction}>Lancer la prédiction</button>
 
-export default Ia;
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {resultText && (
+        <>
+          <h3>Résultat des prédictions :</h3>
+          <pre style={{ backgroundColor: "white", color: "black", padding: "1rem", whiteSpace: "pre-wrap", border: "1px solid #ccc" }}>
+            {resultText}
+          </pre>
+        </>
+      )}
+
+      {imageUrl && (
+        <div>
+          <h3>Graphique de la prédiction :</h3>
+          <img src={imageUrl} alt="Résultat prédiction" style={{ maxWidth: "100%" }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default PredictionComponent;

@@ -1,62 +1,140 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import {
+  Box,
+  Container,
+  Grid,
+  Paper,
+  Typography,
+  Button,
+  TextField,
+  MenuItem,
+} from '@mui/material';
 
-function PredictionComponent() {
+const countries = ['France', 'Germany', 'Italy', 'Spain', 'United States', 'India', 'Brazil'];
+
+const PredictionForm = () => {
+  const [country, setCountry] = useState('France');
+  const [daysAhead, setDaysAhead] = useState(7);
   const [resultText, setResultText] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [error, setError] = useState(null);
 
   const handlePrediction = () => {
-    fetch("http://localhost:8000/api/v1/predict?target=new_cases&country_name=France&days_ahead=7")
-      .then(res => {
-        if (!res.ok) {
-          throw new Error("Erreur HTTP");
-        }
+    const url = `http://localhost:8000/api/v1/predict?target=new_cases&country_name=${country}&days_ahead=${daysAhead}`;
+    fetch(url)
+      .then((res) => {
+        if (!res.ok) throw new Error('Erreur HTTP');
         return res.json();
       })
-      .then(data => {
-        console.log("Réponse IA :", data);
-
-        if (data.image_path) {
-          setImageUrl(`http://localhost:8000/${data.image_path}`);
-        } else {
-          setImageUrl(null);
-        }
-
+      .then((data) => {
+        setImageUrl(data.image_path ? `http://localhost:8000/${data.image_path}` : null);
         setResultText(JSON.stringify(data.prediction || data, null, 2));
         setError(null);
       })
-      .catch(err => {
-        console.error(err);
-        setError("Erreur lors de la récupération de la prédiction.");
+      .catch(() => {
+        setError('Erreur lors de la récupération de la prédiction.');
         setResultText(null);
         setImageUrl(null);
       });
   };
 
   return (
-    <div style={{ backgroundColor: "white", color: "black", padding: "1rem", minHeight: "100vh" }}>
-      <h2>Prédiction IA</h2>
-      <button onClick={handlePrediction}>Lancer la prédiction</button>
+    <Box
+      sx={{
+        bgcolor: 'background.default',
+        minHeight: '100vh',
+        py: { xs: 3, sm: 5, md: 7 },
+      }}
+    >
+      <Container maxWidth="md">
+        <Paper elevation={3} sx={{ p: { xs: 3, md: 4 }, borderRadius: 4, textAlign: 'center' }}>
+          <Typography variant="h5" fontWeight="bold" gutterBottom>
+            Prédiction IA COVID
+          </Typography>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+          <Grid container spacing={3} justifyContent="center" mt={1}>
+            <Grid item xs={12} md={6}>
+              <TextField
+                select
+                fullWidth
+                label="Pays"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+              >
+                {countries.map((c) => (
+                  <MenuItem key={c} value={c}>
+                    {c}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
 
-      {resultText && (
-        <>
-          <h3>Résultat des prédictions :</h3>
-          <pre style={{ backgroundColor: "white", color: "black", padding: "1rem", whiteSpace: "pre-wrap", border: "1px solid #ccc" }}>
-            {resultText}
-          </pre>
-        </>
-      )}
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                type="number"
+                label="Nombre de jours à prévoir"
+                value={daysAhead}
+                onChange={(e) => setDaysAhead(e.target.value)}
+                inputProps={{ min: 1 }}
+              />
+            </Grid>
 
-      {imageUrl && (
-        <div>
-          <h3>Graphique de la prédiction :</h3>
-          <img src={imageUrl} alt="Résultat prédiction" style={{ maxWidth: "100%" }} />
-        </div>
-      )}
-    </div>
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handlePrediction}
+                sx={{ mt: 1, borderRadius: 2, px: 4, py: 1.5 }}
+              >
+                Lancer la prédiction
+              </Button>
+            </Grid>
+          </Grid>
+
+          {error && (
+            <Typography color="error" sx={{ mt: 3 }}>
+              {error}
+            </Typography>
+          )}
+
+          {resultText && (
+            <Box mt={4} textAlign="left">
+              <Typography variant="h6" fontWeight="medium" gutterBottom>
+                Résultat :
+              </Typography>
+              <Paper
+                sx={{
+                  backgroundColor: 'grey.900',
+                  color: 'common.white',
+                  padding: 2,
+                  borderRadius: 2,
+                  overflowX: 'auto',
+                }}
+              >
+                <pre style={{ color: 'inherit', whiteSpace: 'pre-wrap' }}>
+                  {resultText}
+                </pre>
+              </Paper>
+            </Box>
+          )}
+
+          {imageUrl && (
+            <Box mt={4}>
+              <Typography variant="h6" fontWeight="medium" gutterBottom>
+                Graphique de la prédiction :
+              </Typography>
+              <img
+                src={imageUrl}
+                alt="Prédiction"
+                style={{ width: '100%', borderRadius: 12, maxHeight: 500 }}
+              />
+            </Box>
+          )}
+        </Paper>
+      </Container>
+    </Box>
   );
-}
+};
 
-export default PredictionComponent;
+export default PredictionForm;

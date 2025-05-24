@@ -1,6 +1,8 @@
 # Projet MSPR 2
 
-Utilisation de Materiel-UI, ChartJS
+Utilisation de Materiel-UI, ChartJS.
+
+Tests effectués avec Playwright. Pour lancer les tests effectuer la commande: npx playwright test e2e
 
 
 # Getting Started with Create React App

@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 
 const countries = ['France', 'Germany', 'Italy', 'Spain', 'United States', 'India', 'Brazil'];
+const API_KEY = 'ihYY5!PWWK96JzUw@E^wBKAbMT49s*eX&Pnvq*5';
 
 const PredictionForm = () => {
   const [country, setCountry] = useState('France');
@@ -21,17 +22,24 @@ const PredictionForm = () => {
 
   const handlePrediction = () => {
     const url = `http://localhost:8000/api/v1/predict?target=new_cases&country_name=${country}&days_ahead=${daysAhead}`;
-    fetch(url)
+
+    fetch(url, {
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`
+      }
+    })
       .then((res) => {
-        if (!res.ok) throw new Error('Erreur HTTP');
+        if (!res.ok) throw new Error(`Erreur HTTP: ${res.status}`);
         return res.json();
       })
       .then((data) => {
+        // Si ton backend renvoie image_path, sinon null
         setImageUrl(data.image_path ? `http://localhost:8000/${data.image_path}` : null);
-        setResultText(JSON.stringify(data.prediction || data, null, 2));
+        setResultText(JSON.stringify(data.predictions || data, null, 2));
         setError(null);
       })
-      .catch(() => {
+      .catch((err) => {
         setError('Erreur lors de la récupération de la prédiction.');
         setResultText(null);
         setImageUrl(null);
@@ -39,13 +47,7 @@ const PredictionForm = () => {
   };
 
   return (
-    <Box
-      sx={{
-        bgcolor: 'background.default',
-        minHeight: '100vh',
-        py: { xs: 3, sm: 5, md: 7 },
-      }}
-    >
+    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: { xs: 3, sm: 5, md: 7 } }}>
       <Container maxWidth="md">
         <Paper elevation={3} sx={{ p: { xs: 3, md: 4 }, borderRadius: 4, textAlign: 'center' }}>
           <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -75,7 +77,7 @@ const PredictionForm = () => {
                 type="number"
                 label="Nombre de jours à prévoir"
                 value={daysAhead}
-                onChange={(e) => setDaysAhead(e.target.value)}
+                onChange={(e) => setDaysAhead(Number(e.target.value))}
                 inputProps={{ min: 1 }}
               />
             </Grid>

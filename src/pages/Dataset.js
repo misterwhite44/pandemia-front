@@ -32,7 +32,7 @@ const Dataset = () => {
           Gestion des Datasets
         </Typography>
         <Typography variant="body1" sx={{ mb: 3 }}>
-          Ici, tu peux importer des fichiers CSV contenant des données épidémiologiques.
+          Importer des fichiers CSV contenant des données épidémiologiques.
         </Typography>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -50,6 +50,7 @@ const Dataset = () => {
 
           <Button
             variant="contained"
+            aria-label="Importer le fichier"
             color="primary"
             startIcon={<UploadFileIcon />}
             onClick={handleUpload}

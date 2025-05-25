@@ -83,6 +83,7 @@ const PredictionForm = () => {
             <Grid item xs={12}>
               <Button
                 variant="contained"
+                aria-label="Lancer la prédiction"
                 color="primary"
                 onClick={handlePrediction}
                 sx={{ mt: 1, borderRadius: 2, px: 4, py: 1.5 }}

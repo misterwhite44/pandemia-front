@@ -36,6 +36,8 @@ const Dashboard = () => {
             >
               <Paper
                 elevation={3}
+                role="region"
+                aria-labelledby={`chart-title-${index}`}
                 sx={{
                   p: { xs: 2, sm: 3, md: 4 },
                   height: { xs: 280, sm: 320, md: 350 },

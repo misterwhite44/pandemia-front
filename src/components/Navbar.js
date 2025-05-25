@@ -30,9 +30,9 @@ const navItems = [
 ];
 
 const iconLinks = [
-  { icon: <PublicIcon />, path: '/map', label: 'Carte' },
-  { icon: <MemoryIcon />, path: '/ia', label: 'IA' },
-  { icon: <AccountCircleIcon />, path: '/profile', label: 'Profil' },
+  { icon: <PublicIcon />, path: '/map', label: 'Carte', ariaLabel: 'Aller à la carte' },
+  { icon: <MemoryIcon />, path: '/ia', label: 'IA', ariaLabel: 'Aller à l\'IA' },
+  { icon: <AccountCircleIcon />, path: '/profile', label: 'Profil', ariaLabel: 'Voir le profil' },
 ];
 
 const Navbar = ({ toggleTheme }) => {
@@ -94,7 +94,7 @@ const Navbar = ({ toggleTheme }) => {
           )}
 
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Mon Application
+            Pandemia
           </Typography>
 
           {!isMobile && (

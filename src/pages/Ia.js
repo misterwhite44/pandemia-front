@@ -8,7 +8,17 @@ import {
   Button,
   TextField,
   MenuItem,
+  Stack
 } from '@mui/material';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
 
 const countries = ['France', 'Germany', 'Italy', 'Spain', 'United States', 'India', 'Brazil'];
 const API_KEY = 'ihYY5!PWWK96JzUw@E^wBKAbMT49s*eX&Pnvq*5';
@@ -19,6 +29,7 @@ const PredictionForm = () => {
   const [resultText, setResultText] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [error, setError] = useState(null);
+  const [showGraph, setShowGraph] = useState(false);
 
   const handlePrediction = () => {
     const url = `http://localhost:8000/api/v1/predict?target=new_cases&country_name=${country}&days_ahead=${daysAhead}`;
@@ -34,16 +45,33 @@ const PredictionForm = () => {
         return res.json();
       })
       .then((data) => {
-        // Si ton backend renvoie image_path, sinon null
         setImageUrl(data.image_path ? `http://localhost:8000/${data.image_path}` : null);
         setResultText(JSON.stringify(data.predictions || data, null, 2));
         setError(null);
+        setShowGraph(false);
       })
-      .catch((err) => {
+      .catch(() => {
         setError('Erreur lors de la récupération de la prédiction.');
         setResultText(null);
         setImageUrl(null);
+        setShowGraph(false);
       });
+  };
+
+  const parseChartData = () => {
+    try {
+      const data = JSON.parse(resultText);
+      if (!Array.isArray(data)) return [];
+
+      return data
+        .map((item, index) => {
+          const value = parseFloat(item);
+          return !isNaN(value) ? { day: `Jour ${index + 1}`, value } : null;
+        })
+        .filter((item) => item !== null);
+    } catch {
+      return [];
+    }
   };
 
   return (
@@ -83,15 +111,25 @@ const PredictionForm = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <Button
-                variant="contained"
-                aria-label="Lancer la prédiction"
-                color="primary"
-                onClick={handlePrediction}
-                sx={{ mt: 1, borderRadius: 2, px: 4, py: 1.5 }}
-              >
-                Lancer la prédiction
-              </Button>
+              <Stack direction="row" spacing={2} justifyContent="center">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handlePrediction}
+                  sx={{ borderRadius: 2, px: 4, py: 1.5 }}
+                >
+                  Lancer la prédiction
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={() => setShowGraph(true)}
+                  sx={{ borderRadius: 2 }}
+                >
+                  Afficher le graphique
+                </Button>
+              </Stack>
             </Grid>
           </Grid>
 
@@ -122,16 +160,38 @@ const PredictionForm = () => {
             </Box>
           )}
 
-          {imageUrl && (
+          {showGraph && (
             <Box mt={4}>
               <Typography variant="h6" fontWeight="medium" gutterBottom>
                 Graphique de la prédiction :
               </Typography>
-              <img
-                src={imageUrl}
-                alt="Prédiction"
-                style={{ width: '100%', borderRadius: 12, maxHeight: 500 }}
-              />
+              <ResponsiveContainer width="100%" height={400}>
+                <LineChart data={parseChartData()}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="day" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="value" stroke="#1976d2" strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+
+              {imageUrl && (
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = imageUrl;
+                    link.download = `prediction_${country}_${daysAhead}j.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                  sx={{ mt: 2, borderRadius: 2 }}
+                >
+                  Télécharger le graphique
+                </Button>
+              )}
             </Box>
           )}
         </Paper>

@@ -61,18 +61,22 @@ const PredictionForm = () => {
   const parseChartData = () => {
     try {
       const data = JSON.parse(resultText);
-      if (!Array.isArray(data)) return [];
-
-      return data
-        .map((item, index) => {
-          const value = parseFloat(item);
-          return !isNaN(value) ? { day: `Jour ${index + 1}`, value } : null;
-        })
-        .filter((item) => item !== null);
+      // data est un objet, on mappe ses clés
+      return Object.entries(data).map(([key, value]) => ({
+        day: `Jour ${Number(key) + 1}`,
+        value: parseFloat(value.predicted_new_cases)
+      }));
     } catch {
       return [];
     }
   };
+
+  // Calcule min et max pour domain Y Axis avec marge
+  const chartData = parseChartData();
+  const values = chartData.map(d => d.value);
+  const minValue = Math.min(...values);
+  const maxValue = Math.max(...values);
+  const margin = (maxValue - minValue) * 0.1 || 0.0001; // si toutes valeurs identiques, marge fixe
 
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: { xs: 3, sm: 5, md: 7 } }}>
@@ -166,10 +170,10 @@ const PredictionForm = () => {
                 Graphique de la prédiction :
               </Typography>
               <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={parseChartData()}>
+                <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="day" />
-                  <YAxis />
+                  <YAxis domain={[minValue - margin, maxValue + margin]} />
                   <Tooltip />
                   <Line type="monotone" dataKey="value" stroke="#1976d2" strokeWidth={2} />
                 </LineChart>

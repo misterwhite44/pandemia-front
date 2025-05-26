@@ -21,7 +21,7 @@ import {
 } from 'recharts';
 
 const countries = ['France', 'Germany', 'Italy', 'Spain', 'United States', 'India', 'Brazil'];
-const API_KEY = 'ihYY5!PWWK96JzUw@E^wBKAbMT49s*eX&Pnvq*5';
+const API_KEY = process.env.REACT_APP_API_KEY;
 
 const PredictionForm = () => {
   const [country, setCountry] = useState('France');
@@ -61,7 +61,6 @@ const PredictionForm = () => {
   const parseChartData = () => {
     try {
       const data = JSON.parse(resultText);
-      // data est un objet, on mappe ses clés
       return Object.entries(data).map(([key, value]) => ({
         day: `Jour ${Number(key) + 1}`,
         value: parseFloat(value.predicted_new_cases)
@@ -71,12 +70,11 @@ const PredictionForm = () => {
     }
   };
 
-  // Calcule min et max pour domain Y Axis avec marge
   const chartData = parseChartData();
   const values = chartData.map(d => d.value);
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
-  const margin = (maxValue - minValue) * 0.1 || 0.0001; // si toutes valeurs identiques, marge fixe
+  const margin = (maxValue - minValue) * 0.1 || 0.0001;
 
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: { xs: 3, sm: 5, md: 7 } }}>

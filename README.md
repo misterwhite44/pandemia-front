@@ -55,7 +55,7 @@ Déverrouille la configuration si besoin de personnaliser Webpack, Babel, ESLint
 Avant de lancer l'application, crée un fichier `.env` à la racine du projet avec le contenu suivant :
 
 ```env
-VITE_API_KEY=ihYY5!PWWK96JzUw@E^wBKAbMT49s*eX&Pnvq*5
+REACT_APP_API_KEY= 
 
 
 ## Documentation complémentaire

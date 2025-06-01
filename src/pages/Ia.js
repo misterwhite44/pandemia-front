@@ -28,18 +28,20 @@ const PredictionForm = () => {
   const [country, setCountry] = useState('France');
   const [daysAhead, setDaysAhead] = useState(7);
   const [targets, setTargets] = useState(['new_cases']);
-  const [resultData, setResultData] = useState(null);
+  const [resultText, setResultText] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [error, setError] = useState(null);
   const [showGraph, setShowGraph] = useState(false);
 
   const handlePrediction = () => {
-    const url = `http://localhost:8000/api/v1/predict?country=${country}&days=${daysAhead}&targets=${targets.join(',')}`;
+    // Adapte ici l'URL en fonction de ton API si besoin
+    // Exemple avec params corrects (ajuste selon ta vraie API)
+    const url = `http://localhost:8000/api/v1/predict?country_name=${country}&days_ahead=${daysAhead}&targets=${targets.join(',')}`;
 
     fetch(url, {
       headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`
+        Accept: 'application/json',
+        Authorization: `Bearer ${API_KEY}`
       }
     })
       .then((res) => {
@@ -48,33 +50,42 @@ const PredictionForm = () => {
       })
       .then((data) => {
         setImageUrl(data.image_path ? `http://localhost:8000/${data.image_path}` : null);
-        setResultData(data.predictions || data);
+        // Stocker le JSON formaté en string
+        setResultText(JSON.stringify(data.predictions || data, null, 2));
         setError(null);
         setShowGraph(false);
       })
       .catch(() => {
         setError('Erreur lors de la récupération de la prédiction.');
-        setResultData(null);
+        setResultText(null);
         setImageUrl(null);
         setShowGraph(false);
       });
   };
 
+  // Parse le JSON stocké en string dans resultText pour créer les données graphiques
   const parseChartData = () => {
-    if (!resultData) return [];
-    return Object.entries(resultData).map(([dayIndex, prediction]) => {
-      const dayObj = { day: `Jour ${Number(dayIndex) + 1}` };
-      targets.forEach((target) => {
-        dayObj[target] = parseFloat(prediction[`predicted_${target}`] || 0);
+    if (!resultText) return [];
+    try {
+      const data = JSON.parse(resultText);
+      return Object.entries(data).map(([dayIndex, prediction]) => {
+        const dayObj = { day: `Jour ${Number(dayIndex) + 1}` };
+        targets.forEach((target) => {
+          dayObj[target] = parseFloat(prediction[`predicted_${target}`] || 0);
+        });
+        return dayObj;
       });
-      return dayObj;
-    });
+    } catch {
+      return [];
+    }
   };
 
   const chartData = parseChartData();
-  const allValues = chartData.flatMap(d => targets.map(t => d[t]));
-  const minValue = Math.min(...allValues);
-  const maxValue = Math.max(...allValues);
+
+  // Calcul des min/max pour le YAxis avec une marge
+  const allValues = chartData.flatMap(d => targets.map(t => d[t] || 0));
+  const minValue = Math.min(...allValues, 0);
+  const maxValue = Math.max(...allValues, 1);
   const margin = (maxValue - minValue) * 0.1 || 0.0001;
 
   return (
@@ -119,7 +130,7 @@ const PredictionForm = () => {
                 fullWidth
                 label="Cibles à prédire"
                 value={targets}
-                onChange={(e) => setTargets(e.target.value)}
+                onChange={(e) => setTargets(typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value)}
                 SelectProps={{ multiple: true }}
               >
                 {targetOptions.map((target) => (
@@ -146,7 +157,7 @@ const PredictionForm = () => {
                   color="secondary"
                   onClick={() => setShowGraph(true)}
                   sx={{ borderRadius: 2 }}
-                  disabled={!resultData}
+                  disabled={!resultText}
                 >
                   Afficher le graphique
                 </Button>
@@ -160,7 +171,7 @@ const PredictionForm = () => {
             </Typography>
           )}
 
-          {resultData && (
+          {resultText && (
             <Box mt={4} textAlign="left">
               <Typography variant="h6" fontWeight="medium" gutterBottom>
                 Résultat :
@@ -175,7 +186,7 @@ const PredictionForm = () => {
                 }}
               >
                 <pre style={{ color: 'inherit', whiteSpace: 'pre-wrap' }}>
-                  {JSON.stringify(resultData, null, 2)}
+                  {resultText}
                 </pre>
               </Paper>
             </Box>

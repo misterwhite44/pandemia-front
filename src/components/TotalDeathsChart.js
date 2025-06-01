@@ -80,60 +80,60 @@ const TotalDeathsChart = () => {
   const diseaseOptions = [...new Set(data.map((entry) => entry.disease?.name))];
 
   return (
-    <div>
+    <div style={{ width: '100%', height: '100%' }}>
       <h3>Nombre total de morts par pays et par maladie</h3>
       <FormControl
-  variant="outlined"
-  size="small"
-  sx={{
-    minWidth: 140,
-    mb: 2,
-    borderRadius: 3,
-    background: 'transparent',
-    boxShadow: 'none',
-  }}
->
-  <InputLabel
-    id="disease-select-label"
-    sx={{
-      borderRadius: 3,
-      background: 'rgba(25, 118, 210, 0.8)', // Bleu Material UI avec opacité
-      px: 1,
-      color: '#fff', // Texte en blanc
-    }}
-  >
-    Choisir une maladie
-  </InputLabel>
-  <Select
-    labelId="disease-select-label"
-    value={selectedDisease}
-    onChange={(e) => setSelectedDisease(e.target.value)}
-    label="Choisir une maladie"
-    sx={{
-      borderRadius: 3,
-      background: 'transparent',
-      color: '#fff', // Texte en blanc
-      fontWeight: 600,
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#1976d2', // Bleu Material UI
-        borderRadius: 3,
-      },
-      '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#1565c0', // Bleu plus foncé au hover
-      },
-      '& .MuiSvgIcon-root': {
-        color: '#1976d2',
-      },
-    }}
-  >
-    {diseaseOptions.map((disease) => (
-      <MenuItem key={disease} value={disease} sx={{ color: '#fff', background: 'transparent' }}>
-        {disease}
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
-      <div style={{ width: '700px', height: '400px', marginTop: '20px' }}>
+        variant="outlined"
+        size="small"
+        sx={{
+          minWidth: 140,
+          mb: 2,
+          borderRadius: 3,
+          background: 'transparent',
+          boxShadow: 'none',
+        }}
+      >
+        <InputLabel
+          id="disease-select-label"
+          sx={{
+            borderRadius: 3,
+            background: 'rgba(25, 118, 210, 0.8)',
+            px: 1,
+            color: '#fff',
+          }}
+        >
+          Choisir une maladie
+        </InputLabel>
+        <Select
+          labelId="disease-select-label"
+          value={selectedDisease}
+          onChange={(e) => setSelectedDisease(e.target.value)}
+          label="Choisir une maladie"
+          sx={{
+            borderRadius: 3,
+            background: 'transparent',
+            color: '#fff',
+            fontWeight: 600,
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: '#1976d2',
+              borderRadius: 3,
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: '#1565c0',
+            },
+            '& .MuiSvgIcon-root': {
+              color: '#1976d2',
+            },
+          }}
+        >
+          {diseaseOptions.map((disease) => (
+            <MenuItem key={disease} value={disease} sx={{ color: '#fff', background: 'transparent' }}>
+              {disease}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <div style={{ width: '100%', height: 'calc(100% - 100px)' }}>
         {chartData ? <Bar data={chartData} options={options} /> : <p>Chargement des données...</p>}
       </div>
     </div>

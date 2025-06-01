@@ -67,7 +67,7 @@ const DailyCasesChart = () => {
   const options = {
     indexAxis: 'y',
     responsive: true,
-    maintainAspectRatio: false,
+    maintainAspectRatio: false,  // Important pour respecter la hauteur parent
     plugins: {
       legend: { position: 'top' },
       title: {
@@ -77,10 +77,19 @@ const DailyCasesChart = () => {
     },
   };
 
-  const diseaseOptions = [...new Set(data.map((entry) => entry.disease?.name))];
+  const diseaseOptions = [...new Set(data.map((entry) => entry.disease?.name))].filter(Boolean);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 24 }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: 24,
+        height: '100%',      // Prendre toute la hauteur du parent Box
+        boxSizing: 'border-box',
+      }}
+    >
       <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: 16 }}>
         Pays les plus touchés quotidiennement
       </h3>
@@ -135,7 +144,7 @@ const DailyCasesChart = () => {
           ))}
         </Select>
       </FormControl>
-      <div style={{ width: '700px', height: '400px' }}>
+      <div style={{ width: '100%', height: '100%', flexGrow: 1, position: 'relative' }}>
         {chartData ? <Bar data={chartData} options={options} /> : <p>Chargement des données...</p>}
       </div>
     </div>

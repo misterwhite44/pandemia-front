@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Box, Typography } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -62,10 +63,17 @@ const TotalRecoveredChart = () => {
   if (!chartData) return <p>Chargement des données...</p>;
 
   return (
-    <div style={{ height: '400px' }}>
-      <h3>Nombre total de cas guéris (par pays et maladie)</h3>
+    <Box sx={{ width: '100%', height: '100%' }}>
+      <Typography
+        variant="h6"
+        component="h3"
+        align="center"
+        sx={{ mb: 2, fontWeight: 'bold' }}
+      >
+        Nombre total de cas guéris (par pays et maladie)
+      </Typography>
       <Bar data={chartData} options={options} />
-    </div>
+    </Box>
   );
 };
 

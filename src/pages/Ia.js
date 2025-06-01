@@ -34,8 +34,6 @@ const PredictionForm = () => {
   const [showGraph, setShowGraph] = useState(false);
 
   const handlePrediction = () => {
-    // Adapte ici l'URL en fonction de ton API si besoin
-    // Exemple avec params corrects (ajuste selon ta vraie API)
     const url = `http://localhost:8000/api/v1/predict?country_name=${country}&days_ahead=${daysAhead}&targets=${targets.join(',')}`;
 
     fetch(url, {
@@ -82,7 +80,6 @@ const PredictionForm = () => {
 
   const chartData = parseChartData();
 
-  // Calcul des min/max pour le YAxis avec une marge
   const allValues = chartData.flatMap(d => targets.map(t => d[t] || 0));
   const minValue = Math.min(...allValues, 0);
   const maxValue = Math.max(...allValues, 1);

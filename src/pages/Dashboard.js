@@ -1,13 +1,16 @@
 import React from 'react';
-import { Box, Container, Grid, Paper } from '@mui/material';
+import { Box, Container, Grid, Paper, useTheme } from '@mui/material';
 import BarChart from '../components/BarChart';
+import TotalDeathsChart from '../components/TotalDeathsChart';
 import PieChart from '../components/PieChart';
 import PieChart2 from '../components/PieChart2';
-import TotalDeathsChart from '../components/TotalDeathsChart';
 import TotalRecoveredChart from '../components/TotalRecoveredChart';
 import DailyCasesChart from '../components/DailyCasesChart';
+// ...import de tes charts
 
 const Dashboard = () => {
+  const theme = useTheme();
+
   const charts = [
     { component: <BarChart /> },
     { component: <TotalDeathsChart /> },
@@ -20,8 +23,8 @@ const Dashboard = () => {
   return (
     <Box
       sx={{
-        bgcolor: '#121212', // fond sombre renforcé
-        color: '#ffffff',   // texte blanc (fort contraste)
+        bgcolor: theme.palette.background.default,
+        color: theme.palette.text.primary,
         minHeight: '100vh',
         py: { xs: 3, sm: 5, md: 7 },
       }}
@@ -40,8 +43,8 @@ const Dashboard = () => {
                 elevation={4}
                 sx={{
                   p: 2,
-                  backgroundColor: '#1e1e1e',  // contraste renforcé
-                  color: '#ffffff',            // texte clair
+                  backgroundColor: theme.palette.background.paper,
+                  color: theme.palette.text.primary,
                   height: 'auto',
                   display: 'flex',
                   flexDirection: 'column',

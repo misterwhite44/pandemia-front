@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Box, Typography } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -15,14 +16,50 @@ ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend)
 const BarChart = () => {
   const [chartData, setChartData] = useState(null);
 
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: 'Cas COVID-19 par continent',
+        color: '#000000',
+        font: {
+          size: 18,
+          weight: 'bold'
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          autoSkip: false,
+          maxRotation: 45,
+          minRotation: 30,
+          color: '#000000'  // texte noir
+        },
+        grid: {
+          color: '#ffffff'  // grille blanche
+        }
+      },
+      y: {
+        beginAtZero: true,
+        ticks: {
+          color: '#000000'  // texte noir
+        },
+        grid: {
+          color: '#ffffff'  // grille blanche
+        }
+      }
+    }
+  };
+
   useEffect(() => {
     fetch('http://localhost:8080/globaldata')
       .then((res) => res.json())
       .then((data) => {
-        if (!Array.isArray(data)) {
-          console.error('La donnée reçue n’est pas un tableau :', data);
-          return;
-        }
+        if (!Array.isArray(data)) return;
 
         const continentTotals = {};
 
@@ -52,56 +89,24 @@ const BarChart = () => {
           ]
         });
       })
-      .catch((err) => console.error('Erreur lors du fetch :', err));
+      .catch(() => {});
   }, []);
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: false
-      },
-      title: {
-        display: true,
-        text: 'Cas COVID-19 par continent',
-        color: '#ffffff',
-        font: {
-          size: 18,
-          weight: 'bold'
-        }
-      }
-    },
-    scales: {
-      x: {
-        ticks: {
-          autoSkip: false,
-          maxRotation: 45,
-          minRotation: 30,
-          color: '#ffffff'
-        },
-        grid: {
-          color: '#444444'
-        }
-      },
-      y: {
-        beginAtZero: true,
-        ticks: {
-          color: '#ffffff'
-        },
-        grid: {
-          color: '#444444'
-        }
-      }
-    }
-  };
-
-  if (!chartData) return <p style={{ color: '#ffffff' }}>Chargement des données...</p>;
+  if (!chartData) return <p>Chargement des données...</p>;
 
   return (
-    <div style={{ height: '400px' }}>
+    <Box sx={{ width: '100%', height: 400 }}>
+      <Typography
+        variant="h6"
+        component="h3"
+        align="center"
+        sx={{ mb: 2, fontWeight: 'bold' }}
+      >
+        Total des cas COVID-19 par continent
+      </Typography>
+
       <Bar data={chartData} options={options} />
-    </div>
+    </Box>
   );
 };
 

@@ -62,13 +62,14 @@ const TotalRecoveredChart = () => {
   return (
     <Box sx={{ width: '100%', height: '100%' }}>
       <Typography
-        variant="h6"
-        component="h3"
-        align="center"
-        sx={{ mb: 2, fontWeight: 'bold' }}
-      >
-        Nombre total de cas guéris (par pays et maladie)
-      </Typography>
+  variant="h6"
+  component="h3"
+  align="center"
+  sx={{ mb: 2, fontWeight: 'bold' }}
+>
+  Nombre total de cas guéris (par pays et maladie)
+</Typography>
+
       <Bar data={chartData} options={options} />
     </Box>
   );

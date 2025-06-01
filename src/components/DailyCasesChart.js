@@ -9,11 +9,13 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, useTheme } from '@mui/material';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const DailyCasesChart = () => {
+  const theme = useTheme();
+
   const [data, setData] = useState([]);
   const [selectedDisease, setSelectedDisease] = useState('COVID-19');
   const [chartData, setChartData] = useState(null);
@@ -51,6 +53,7 @@ const DailyCasesChart = () => {
     const labels = sortedCountries.map(([country]) => country);
     const values = sortedCountries.map(([_, cases]) => cases);
 
+    // Couleurs WCAG fixes, ça ne change pas avec le thème
     const wcagColors = ['#42a5f5', '#ef5350', '#66bb6a', '#ffa726', '#ab47bc'];
 
     setChartData({
@@ -72,13 +75,13 @@ const DailyCasesChart = () => {
     plugins: {
       legend: {
         labels: {
-          color: '#ffffff',
+          color: theme.palette.text.primary,
         },
       },
       title: {
         display: true,
         text: `Pays les plus touchés quotidiennement (${selectedDisease})`,
-        color: '#ffffff',
+        color: theme.palette.text.primary,
         font: {
           size: 16,
           weight: 'bold',
@@ -88,18 +91,18 @@ const DailyCasesChart = () => {
     scales: {
       x: {
         ticks: {
-          color: '#ffffff',
+          color: theme.palette.text.primary,
         },
         grid: {
-          color: '#444444',
+          color: theme.palette.divider,
         },
       },
       y: {
         ticks: {
-          color: '#ffffff',
+          color: theme.palette.text.primary,
         },
         grid: {
-          color: '#444444',
+          color: theme.palette.divider,
         },
       },
     },
@@ -118,7 +121,14 @@ const DailyCasesChart = () => {
         boxSizing: 'border-box',
       }}
     >
-      <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: 16, color: '#ffffff' }}>
+      <h3
+        style={{
+          fontSize: '1.25rem',
+          fontWeight: 600,
+          marginBottom: 16,
+          color: theme.palette.text.primary,
+        }}
+      >
         Pays les plus touchés quotidiennement
       </h3>
       <FormControl
@@ -128,14 +138,14 @@ const DailyCasesChart = () => {
           minWidth: 140,
           mb: 2,
           borderRadius: 3,
-          background: 'rgba(25, 118, 210, 0.15)',
+          background: theme.palette.action.selected, // fond adaptable
         }}
       >
         <InputLabel
           id="disease-select-label"
           sx={{
-            color: '#ffffff',
-            background: 'rgba(25, 118, 210, 0.8)',
+            color: theme.palette.text.primary,
+            background: theme.palette.background.paper,
             px: 1,
           }}
         >
@@ -147,17 +157,17 @@ const DailyCasesChart = () => {
           onChange={(e) => setSelectedDisease(e.target.value)}
           label="Choisir une maladie"
           sx={{
-            color: '#ffffff',
+            color: theme.palette.text.primary,
             fontWeight: 600,
             borderRadius: 3,
             '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: '#1976d2',
+              borderColor: theme.palette.primary.main,
             },
             '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: '#1565c0',
+              borderColor: theme.palette.primary.dark,
             },
             '& .MuiSvgIcon-root': {
-              color: '#1976d2',
+              color: theme.palette.primary.main,
             },
           }}
         >
@@ -166,10 +176,10 @@ const DailyCasesChart = () => {
               key={disease}
               value={disease}
               sx={{
-                color: '#ffffff',
-                background: '#1e1e1e',
+                color: theme.palette.text.primary,
+                background: theme.palette.background.paper,
                 '&:hover': {
-                  background: '#333',
+                  background: theme.palette.action.hover,
                 },
               }}
             >
@@ -182,7 +192,7 @@ const DailyCasesChart = () => {
         {chartData ? (
           <Bar data={chartData} options={options} />
         ) : (
-          <p style={{ color: '#ffffff' }}>Chargement des données...</p>
+          <p style={{ color: theme.palette.text.primary }}>Chargement des données...</p>
         )}
       </div>
     </div>

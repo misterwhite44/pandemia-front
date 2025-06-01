@@ -48,8 +48,7 @@ const PredictionForm = () => {
       })
       .then((data) => {
         setImageUrl(data.image_path ? `http://localhost:8000/${data.image_path}` : null);
-        // Stocker le JSON formaté en string
-        setResultText(JSON.stringify(data.predictions || data, null, 2));
+        setResultText(JSON.stringify(data.predictions || {}, null, 2));
         setError(null);
         setShowGraph(false);
       })
@@ -61,15 +60,17 @@ const PredictionForm = () => {
       });
   };
 
-  // Parse le JSON stocké en string dans resultText pour créer les données graphiques
   const parseChartData = () => {
     if (!resultText) return [];
     try {
-      const data = JSON.parse(resultText);
-      return Object.entries(data).map(([dayIndex, prediction]) => {
-        const dayObj = { day: `Jour ${Number(dayIndex) + 1}` };
-        targets.forEach((target) => {
-          dayObj[target] = parseFloat(prediction[`predicted_${target}`] || 0);
+      const predsObj = JSON.parse(resultText);
+      const firstTarget = targets[0];
+      const length = predsObj[firstTarget]?.length || 0;
+      return Array.from({ length }, (_, i) => {
+        const dayObj = { day: `Jour ${i + 1}` };
+        targets.forEach((t) => {
+          const entry = (predsObj[t] || [])[i] || {};
+          dayObj[t] = parseFloat(entry[`predicted_${t}`] || 0);
         });
         return dayObj;
       });
@@ -79,8 +80,7 @@ const PredictionForm = () => {
   };
 
   const chartData = parseChartData();
-
-  const allValues = chartData.flatMap(d => targets.map(t => d[t] || 0));
+  const allValues = chartData.flatMap((d) => targets.map((t) => d[t] || 0));
   const minValue = Math.min(...allValues, 0);
   const maxValue = Math.max(...allValues, 1);
   const margin = (maxValue - minValue) * 0.1 || 0.0001;
@@ -127,7 +127,12 @@ const PredictionForm = () => {
                 fullWidth
                 label="Cibles à prédire"
                 value={targets}
-                onChange={(e) => setTargets(typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value)}
+                onChange={(e) =>
+                  setTargets(typeof e.target.value === 'string'
+                    ? e.target.value.split(',')
+                    : e.target.value
+                  )
+                }
                 SelectProps={{ multiple: true }}
               >
                 {targetOptions.map((target) => (

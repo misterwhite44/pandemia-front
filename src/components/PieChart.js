@@ -9,6 +9,17 @@ const PieChart = () => {
 
   const options = {
     maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: '#000', // Texte noir pour bon contraste
+          font: {
+            weight: 'bold',
+            size: 14,
+          },
+        },
+      },
+    },
   };
 
   useEffect(() => {
@@ -33,7 +44,13 @@ const PieChart = () => {
           datasets: [
             {
               data: values,
-              backgroundColor: ['#1976d2', '#f57c00', '#9c27b0', '#4caf50', '#e91e63'],
+              backgroundColor: [
+                '#003f5c', // bleu foncé
+                '#58508d', // violet
+                '#bc5090', // rose foncé
+                '#ff6361', // rouge orangé
+                '#ffa600'  // jaune foncé
+              ],
             },
           ],
         });
@@ -44,10 +61,25 @@ const PieChart = () => {
   if (!chartData) return <p>Chargement des données...</p>;
 
   return (
-    <div>
-      <h3>Pays les plus touchés par le Covid-19</h3>
+    <div
+      role="region"
+      aria-labelledby="chart-title"
+      style={{ color: '#000' }}
+    >
+      <h3 id="chart-title">Pays les plus touchés par le Covid-19</h3>
       <div style={{ width: '300px', height: '300px' }}>
-        <Pie data={chartData} options={options} />
+        <Pie data={chartData} options={options} aria-label="Diagramme circulaire des cas COVID-19 par pays" />
+      </div>
+
+      <div>
+        <h4>Données textuelles pour accessibilité :</h4>
+        <ul>
+          {chartData.labels.map((label, i) => (
+            <li key={label} style={{ color: '#000' }}>
+              {label} : {chartData.datasets[0].data[i].toLocaleString()} cas
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

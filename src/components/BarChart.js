@@ -38,6 +38,8 @@ const BarChart = () => {
 
         const labels = Object.keys(continentTotals);
         const values = Object.values(continentTotals);
+        const wcagColors = ['#42a5f5', '#ef5350', '#66bb6a', '#ffa726', '#ab47bc', '#26c6da'];
+        const backgroundColors = labels.map((_, i) => wcagColors[i % wcagColors.length]);
 
         setChartData({
           labels,
@@ -45,7 +47,7 @@ const BarChart = () => {
             {
               label: 'Total des cas COVID-19 par continent',
               data: values,
-              backgroundColor: '#42a5f5'
+              backgroundColor: backgroundColors
             }
           ]
         });
@@ -57,10 +59,17 @@ const BarChart = () => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: false },
+      legend: {
+        display: false
+      },
       title: {
         display: true,
-        text: 'Cas COVID-19 par continent'
+        text: 'Cas COVID-19 par continent',
+        color: '#ffffff',
+        font: {
+          size: 18,
+          weight: 'bold'
+        }
       }
     },
     scales: {
@@ -68,16 +77,26 @@ const BarChart = () => {
         ticks: {
           autoSkip: false,
           maxRotation: 45,
-          minRotation: 30
+          minRotation: 30,
+          color: '#ffffff'
+        },
+        grid: {
+          color: '#444444'
         }
       },
       y: {
-        beginAtZero: true
+        beginAtZero: true,
+        ticks: {
+          color: '#ffffff'
+        },
+        grid: {
+          color: '#444444'
+        }
       }
     }
   };
 
-  if (!chartData) return <p>Chargement des données...</p>;
+  if (!chartData) return <p style={{ color: '#ffffff' }}>Chargement des données...</p>;
 
   return (
     <div style={{ height: '400px' }}>

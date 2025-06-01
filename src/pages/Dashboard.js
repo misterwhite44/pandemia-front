@@ -20,7 +20,8 @@ const Dashboard = () => {
   return (
     <Box
       sx={{
-        bgcolor: 'background.default',
+        bgcolor: '#121212', // fond sombre renforcé
+        color: '#ffffff',   // texte blanc (fort contraste)
         minHeight: '100vh',
         py: { xs: 3, sm: 5, md: 7 },
       }}
@@ -36,21 +37,23 @@ const Dashboard = () => {
               md={index > 1 ? 4 : 6}
             >
               <Paper
-                elevation={3}
+                elevation={4}
                 sx={{
                   p: 2,
-                  height: 'auto',          // Hauteur automatique
+                  backgroundColor: '#1e1e1e',  // contraste renforcé
+                  color: '#ffffff',            // texte clair
+                  height: 'auto',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
                   borderRadius: 4,
-                  overflow: 'hidden',      // Couper tout dépassement
+                  overflow: 'hidden',
                 }}
               >
                 <Box
                   sx={{
                     width: '100%',
-                    height: 400,          // Hauteur fixe pour le graphique
+                    height: 400,
                     position: 'relative',
                     '& canvas': {
                       height: '100% !important',

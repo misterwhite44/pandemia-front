@@ -40,7 +40,6 @@ const DailyCasesChart = () => {
     filtered.forEach((entry) => {
       const country = entry.country?.name;
       const newCases = entry.newCases || 0;
-
       if (!grouped[country]) grouped[country] = 0;
       grouped[country] += newCases;
     });
@@ -52,13 +51,15 @@ const DailyCasesChart = () => {
     const labels = sortedCountries.map(([country]) => country);
     const values = sortedCountries.map(([_, cases]) => cases);
 
+    const wcagColors = ['#42a5f5', '#ef5350', '#66bb6a', '#ffa726', '#ab47bc'];
+
     setChartData({
       labels,
       datasets: [
         {
           label: selectedDisease,
           data: values,
-          backgroundColor: '#2196f3',
+          backgroundColor: wcagColors.slice(0, labels.length),
         },
       ],
     });
@@ -67,12 +68,39 @@ const DailyCasesChart = () => {
   const options = {
     indexAxis: 'y',
     responsive: true,
-    maintainAspectRatio: false,  // Important pour respecter la hauteur parent
+    maintainAspectRatio: false,
     plugins: {
-      legend: { position: 'top' },
+      legend: {
+        labels: {
+          color: '#ffffff',
+        },
+      },
       title: {
         display: true,
         text: `Pays les plus touchés quotidiennement (${selectedDisease})`,
+        color: '#ffffff',
+        font: {
+          size: 16,
+          weight: 'bold',
+        },
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: '#ffffff',
+        },
+        grid: {
+          color: '#444444',
+        },
+      },
+      y: {
+        ticks: {
+          color: '#ffffff',
+        },
+        grid: {
+          color: '#444444',
+        },
       },
     },
   };
@@ -86,11 +114,11 @@ const DailyCasesChart = () => {
         flexDirection: 'column',
         alignItems: 'center',
         padding: 24,
-        height: '100%',      // Prendre toute la hauteur du parent Box
+        height: '100%',
         boxSizing: 'border-box',
       }}
     >
-      <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: 16 }}>
+      <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: 16, color: '#ffffff' }}>
         Pays les plus touchés quotidiennement
       </h3>
       <FormControl
@@ -100,17 +128,15 @@ const DailyCasesChart = () => {
           minWidth: 140,
           mb: 2,
           borderRadius: 3,
-          background: 'transparent',
-          boxShadow: 'none',
+          background: 'rgba(25, 118, 210, 0.15)',
         }}
       >
         <InputLabel
           id="disease-select-label"
           sx={{
-            borderRadius: 3,
+            color: '#ffffff',
             background: 'rgba(25, 118, 210, 0.8)',
             px: 1,
-            color: '#fff',
           }}
         >
           Choisir une maladie
@@ -121,13 +147,11 @@ const DailyCasesChart = () => {
           onChange={(e) => setSelectedDisease(e.target.value)}
           label="Choisir une maladie"
           sx={{
-            borderRadius: 3,
-            background: 'transparent',
-            color: '#fff',
+            color: '#ffffff',
             fontWeight: 600,
+            borderRadius: 3,
             '& .MuiOutlinedInput-notchedOutline': {
               borderColor: '#1976d2',
-              borderRadius: 3,
             },
             '&:hover .MuiOutlinedInput-notchedOutline': {
               borderColor: '#1565c0',
@@ -138,14 +162,28 @@ const DailyCasesChart = () => {
           }}
         >
           {diseaseOptions.map((disease) => (
-            <MenuItem key={disease} value={disease} sx={{ color: '#fff', background: 'transparent' }}>
+            <MenuItem
+              key={disease}
+              value={disease}
+              sx={{
+                color: '#ffffff',
+                background: '#1e1e1e',
+                '&:hover': {
+                  background: '#333',
+                },
+              }}
+            >
               {disease}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
       <div style={{ width: '100%', height: '100%', flexGrow: 1, position: 'relative' }}>
-        {chartData ? <Bar data={chartData} options={options} /> : <p>Chargement des données...</p>}
+        {chartData ? (
+          <Bar data={chartData} options={options} />
+        ) : (
+          <p style={{ color: '#ffffff' }}>Chargement des données...</p>
+        )}
       </div>
     </div>
   );

@@ -31,10 +31,7 @@ const TotalRecoveredChart = () => {
     fetch('http://localhost:8080/globaldata')
       .then((res) => res.json())
       .then((data) => {
-        if (!Array.isArray(data)) {
-          console.error('Les données ne sont pas un tableau :', data);
-          return;
-        }
+        if (!Array.isArray(data)) return;
 
         const filteredData = data
           .filter((entry) => entry.totalRecovered && entry.totalRecovered > 0)
@@ -57,7 +54,7 @@ const TotalRecoveredChart = () => {
           ],
         });
       })
-      .catch((err) => console.error('Erreur lors du fetch :', err));
+      .catch(() => {});
   }, []);
 
   if (!chartData) return <p>Chargement des données...</p>;

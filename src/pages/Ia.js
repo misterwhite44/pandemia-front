@@ -41,7 +41,7 @@ const PredictionForm = () => {
 
   const handlePrediction = () => {
     setIsLoading(true);
-    const url = `http://localhost:8000/api/v1/predict?country_name=${country}&days_ahead=${daysAhead}&targets=${targets.join(',')}`;
+    const url = `http://localhost:8000/api/v1/predict?country=${country}&days=${daysAhead}&targets=${targets.join(',')}`;
 
     fetch(url, {
       headers: {
@@ -76,7 +76,7 @@ const PredictionForm = () => {
       const chartData = {};
 
       targets.forEach((target) => {
-        chartData[target] = predsObj[target]?.map((entry, i) => ({
+        chartData[target] = predsObj[target]?.slice(0, daysAhead).map((entry, i) => ({
           day: `Jour ${i + 1}`,
           value: parseFloat(entry[`predicted_${target}`] || 0),
         })) || [];
@@ -128,7 +128,7 @@ const PredictionForm = () => {
                 label="Nombre de jours à prévoir"
                 value={daysAhead}
                 onChange={(e) => setDaysAhead(Number(e.target.value))}
-                inputProps={{ min: 1 }}
+                inputProps={{ min: 1, max: 30 }}
               />
             </Grid>
 

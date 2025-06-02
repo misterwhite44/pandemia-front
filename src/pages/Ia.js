@@ -30,7 +30,7 @@ const PredictionForm = () => {
   const [daysAhead, setDaysAhead] = useState(7);
   const [targets, setTargets] = useState(['new_cases']);
   const [resultText, setResultText] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null);
+  const [metrics, setMetrics] = useState({});
   const [error, setError] = useState(null);
   const [showGraph, setShowGraph] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,14 +50,14 @@ const PredictionForm = () => {
           return res.json();
         })
         .then((data) => {
-          setImageUrl(data.image_path ? `http://localhost:8000/${data.image_path}` : null);
-          setResultText(JSON.stringify(data.predictions || {}, null, 2)); // Optionnel si vous ne voulez pas afficher les données brutes
+          setResultText(JSON.stringify(data.predictions || {}, null, 2));
+          setMetrics(data.metrics || {}); // Stocke les métriques
           setError(null);
-          setShowGraph(true); // Affiche directement le graphique
+          setShowGraph(true);
         })
         .catch(() => {
           setError('Erreur lors de la récupération de la prédiction.');
-          setImageUrl(null);
+          setMetrics({});
           setShowGraph(false);
         })
         .finally(() => {
@@ -198,6 +198,19 @@ const PredictionForm = () => {
                           />
                         </LineChart>
                       </ResponsiveContainer>
+                      {metrics[target] && (
+                          <Box mt={2}>
+                            <Typography variant="body1">
+                              <strong>MAE :</strong> {metrics[target].MAE.toFixed(2)}
+                            </Typography>
+                            <Typography variant="body1">
+                              <strong>RMSE :</strong> {metrics[target].RMSE.toFixed(2)}
+                            </Typography>
+                            <Typography variant="body1">
+                              <strong>R² :</strong> {metrics[target].R2.toFixed(2)}
+                            </Typography>
+                          </Box>
+                      )}
                     </Box>
                 ))}
               </Box>

@@ -22,7 +22,11 @@ import {
 } from 'recharts';
 
 const countries = ['France', 'Germany', 'Italy', 'Spain', 'United States', 'India', 'Brazil'];
-const targetOptions = ['new_cases', 'new_deaths', 'new_recovered'];
+const targetOptions = [
+  { value: 'new_cases', label: 'Nouveaux cas' },
+  { value: 'new_deaths', label: 'Nouveaux décès' },
+  { value: 'new_recovered', label: 'Nouveaux guéris' }
+];
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const PredictionForm = () => {
@@ -143,9 +147,9 @@ const PredictionForm = () => {
                 SelectProps={{ multiple: true }}
               >
                 {targetOptions.map((target) => (
-                  <MenuItem key={target} value={target}>
-                    {target}
-                  </MenuItem>
+                    <MenuItem key={target.value} value={target.value}>
+                      {target.label}
+                    </MenuItem>
                 ))}
               </TextField>
             </Grid>
@@ -182,7 +186,7 @@ const PredictionForm = () => {
                 {targets.map((target, idx) => (
                     <Box key={target} mt={4}>
                       <Typography variant="h6" fontWeight="medium" gutterBottom>
-                        Graphique de la prédiction : {target.replace('_', ' ')}
+                        Graphique de la prédiction : {targetOptions.find((t) => t.value === target)?.label}
                       </Typography>
                       <ResponsiveContainer width="100%" height={400}>
                         <LineChart data={chartData[target]}>

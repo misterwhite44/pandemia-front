@@ -179,18 +179,6 @@ const TotalDeathsChart = () => {
         )}
       </div>
 
-      {chartData && (
-        <div>
-          <h4>Données textuelles pour accessibilité :</h4>
-          <ul>
-            {chartData.labels.map((label, i) => (
-              <li key={label}>
-                {label} : {chartData.datasets[0].data[i].toLocaleString()} morts
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </section>
   );
 };

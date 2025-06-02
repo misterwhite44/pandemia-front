@@ -71,16 +71,7 @@ const PieChart = () => {
         <Pie data={chartData} options={options} aria-label="Diagramme circulaire des cas Monkeypox par pays" />
       </div>
 
-      <div>
-        <h4>Données textuelles pour accessibilité :</h4>
-        <ul>
-          {chartData.labels.map((label, i) => (
-            <li key={label} style={{ color: '#000' }}>
-              {label} : {chartData.datasets[0].data[i].toLocaleString()} cas
-            </li>
-          ))}
-        </ul>
-      </div>
+
     </div>
   );
 };

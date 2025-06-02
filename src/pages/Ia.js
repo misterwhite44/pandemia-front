@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
 import {
   Box,
   Container,
@@ -32,8 +33,10 @@ const PredictionForm = () => {
   const [imageUrl, setImageUrl] = useState(null);
   const [error, setError] = useState(null);
   const [showGraph, setShowGraph] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePrediction = () => {
+    setIsLoading(true);
     const url = `http://localhost:8000/api/v1/predict?country_name=${country}&days_ahead=${daysAhead}&targets=${targets.join(',')}`;
 
     fetch(url, {
@@ -42,22 +45,24 @@ const PredictionForm = () => {
         Authorization: `Bearer ${API_KEY}`
       }
     })
-      .then((res) => {
-        if (!res.ok) throw new Error(`Erreur HTTP: ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        setImageUrl(data.image_path ? `http://localhost:8000/${data.image_path}` : null);
-        setResultText(JSON.stringify(data.predictions || {}, null, 2));
-        setError(null);
-        setShowGraph(false);
-      })
-      .catch(() => {
-        setError('Erreur lors de la récupération de la prédiction.');
-        setResultText(null);
-        setImageUrl(null);
-        setShowGraph(false);
-      });
+        .then((res) => {
+          if (!res.ok) throw new Error(`Erreur HTTP: ${res.status}`);
+          return res.json();
+        })
+        .then((data) => {
+          setImageUrl(data.image_path ? `http://localhost:8000/${data.image_path}` : null);
+          setResultText(JSON.stringify(data.predictions || {}, null, 2)); // Optionnel si vous ne voulez pas afficher les données brutes
+          setError(null);
+          setShowGraph(true); // Affiche directement le graphique
+        })
+        .catch(() => {
+          setError('Erreur lors de la récupération de la prédiction.');
+          setImageUrl(null);
+          setShowGraph(false);
+        })
+        .finally(() => {
+          setIsLoading(false); // Arrête le loader
+        });
   };
 
   const parseChartData = () => {
@@ -150,48 +155,24 @@ const PredictionForm = () => {
                   color="primary"
                   onClick={handlePrediction}
                   sx={{ borderRadius: 2, px: 4, py: 1.5 }}
+                  disabled={isLoading}
                 >
-                  Lancer la prédiction
-                </Button>
-
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={() => setShowGraph(true)}
-                  sx={{ borderRadius: 2 }}
-                  disabled={!resultText}
-                >
-                  Afficher le graphique
+                  {isLoading ? 'Chargement...' : 'Lancer la prédiction'}
                 </Button>
               </Stack>
             </Grid>
           </Grid>
 
+          {isLoading && (
+              <Box mt={3}>
+                <CircularProgress color="primary" />
+              </Box>
+          )}
+
           {error && (
             <Typography color="error" sx={{ mt: 3 }}>
               {error}
             </Typography>
-          )}
-
-          {resultText && (
-            <Box mt={4} textAlign="left">
-              <Typography variant="h6" fontWeight="medium" gutterBottom>
-                Résultat :
-              </Typography>
-              <Paper
-                sx={{
-                  backgroundColor: 'grey.900',
-                  color: 'common.white',
-                  padding: 2,
-                  borderRadius: 2,
-                  overflowX: 'auto',
-                }}
-              >
-                <pre style={{ color: 'inherit', whiteSpace: 'pre-wrap' }}>
-                  {resultText}
-                </pre>
-              </Paper>
-            </Box>
           )}
 
           {showGraph && chartData.length > 0 && (

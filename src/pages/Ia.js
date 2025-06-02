@@ -66,26 +66,28 @@ const PredictionForm = () => {
   };
 
   const parseChartData = () => {
-    if (!resultText) return [];
+    if (!resultText) return { new_cases: [], new_deaths: [], new_recovered: [] };
     try {
       const predsObj = JSON.parse(resultText);
-      const firstTarget = targets[0];
-      const length = predsObj[firstTarget]?.length || 0;
-      return Array.from({ length }, (_, i) => {
-        const dayObj = { day: `Jour ${i + 1}` };
-        targets.forEach((t) => {
-          const entry = (predsObj[t] || [])[i] || {};
-          dayObj[t] = parseFloat(entry[`predicted_${t}`] || 0);
-        });
-        return dayObj;
+      const chartData = {};
+
+      targets.forEach((target) => {
+        chartData[target] = predsObj[target]?.map((entry, i) => ({
+          day: `Jour ${i + 1}`,
+          value: parseFloat(entry[`predicted_${target}`] || 0),
+        })) || [];
       });
+
+      return chartData;
     } catch {
-      return [];
+      return { new_cases: [], new_deaths: [], new_recovered: [] };
     }
   };
 
   const chartData = parseChartData();
-  const allValues = chartData.flatMap((d) => targets.map((t) => d[t] || 0));
+  const allValues = Object.values(chartData)
+      .flat()
+      .map((entry) => entry.value || 0);
   const minValue = Math.min(...allValues, 0);
   const maxValue = Math.max(...allValues, 1);
   const margin = (maxValue - minValue) * 0.1 || 0.0001;
@@ -175,48 +177,30 @@ const PredictionForm = () => {
             </Typography>
           )}
 
-          {showGraph && chartData.length > 0 && (
-            <Box mt={4}>
-              <Typography variant="h6" fontWeight="medium" gutterBottom>
-                Graphique de la prédiction :
-              </Typography>
-              <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
-                  <YAxis domain={[minValue - margin, maxValue + margin]} />
-                  <Tooltip />
-                  {targets.map((target, idx) => (
-                    <Line
-                      key={target}
-                      type="monotone"
-                      dataKey={target}
-                      stroke={['#1976d2', '#d32f2f', '#2e7d32'][idx % 3]}
-                      strokeWidth={2}
-                    />
-                  ))}
-                </LineChart>
-              </ResponsiveContainer>
-
-              {imageUrl && (
-                <Box mt={2}>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => {
-                      const link = document.createElement('a');
-                      link.href = imageUrl;
-                      link.download = `prediction_${country}_${daysAhead}j.png`;
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }}
-                  >
-                    Télécharger le graphique
-                  </Button>
-                </Box>
-              )}
-            </Box>
+          {showGraph && Object.keys(chartData).length > 0 && (
+              <Box mt={4}>
+                {targets.map((target, idx) => (
+                    <Box key={target} mt={4}>
+                      <Typography variant="h6" fontWeight="medium" gutterBottom>
+                        Graphique de la prédiction : {target.replace('_', ' ')}
+                      </Typography>
+                      <ResponsiveContainer width="100%" height={400}>
+                        <LineChart data={chartData[target]}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="day" />
+                          <YAxis />
+                          <Tooltip />
+                          <Line
+                              type="monotone"
+                              dataKey="value"
+                              stroke={['#1976d2', '#d32f2f', '#2e7d32'][idx % 3]}
+                              strokeWidth={2}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </Box>
+                ))}
+              </Box>
           )}
         </Paper>
       </Container>

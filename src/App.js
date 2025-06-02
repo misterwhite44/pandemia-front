@@ -11,7 +11,7 @@ import Ia from './pages/Ia';
 
 
 const App = () => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => {
     setIsDarkMode((prevMode) => !prevMode);

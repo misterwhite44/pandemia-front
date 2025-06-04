@@ -1,25 +1,31 @@
-FROM node:14
+# Étape 1 : Build React avec Node
+FROM node:18 AS build
 
-# Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package.json package-lock.json ./
+# Récupération des arguments pour les variables d’environnement
+ARG REACT_APP_API_KEY
 
-# Install dependencies
+# Rendre l’argument disponible pendant le build de React
+ENV REACT_APP_API_KEY=$REACT_APP_API_KEY
+
+COPY package*.json ./
 RUN npm install
 
-# Copy the rest of the application code
 COPY . .
 
-# Build the application
+# Build avec variables intégrées
 RUN npm run build
 
-# Set environment variables
-ENV REACT_APP_API_KEY=${REACT_APP_API_KEY}
+# Étape 2 : Nginx pour servir les fichiers statiques
+FROM nginx:alpine
 
-# Expose the port the app runs on
-EXPOSE 3000
+# Copier le build React dans le dossier public de Nginx
+COPY --from=build /app/build /usr/share/nginx/html
 
-# Command to run the application
-CMD ["npm", "start"]
+# Copier la config personnalisée de Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

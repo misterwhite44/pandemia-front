@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Box, Typography } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -30,10 +31,7 @@ const TotalRecoveredChart = () => {
     fetch('http://localhost:8080/globaldata')
       .then((res) => res.json())
       .then((data) => {
-        if (!Array.isArray(data)) {
-          console.error('Les données ne sont pas un tableau :', data);
-          return;
-        }
+        if (!Array.isArray(data)) return;
 
         const filteredData = data
           .filter((entry) => entry.totalRecovered && entry.totalRecovered > 0)
@@ -56,16 +54,24 @@ const TotalRecoveredChart = () => {
           ],
         });
       })
-      .catch((err) => console.error('Erreur lors du fetch :', err));
+      .catch(() => {});
   }, []);
 
   if (!chartData) return <p>Chargement des données...</p>;
 
   return (
-    <div style={{ height: '400px' }}>
-      <h3>Nombre total de cas guéris (par pays et maladie)</h3>
+    <Box sx={{ width: '100%', height: '100%' }}>
+      <Typography
+  variant="h6"
+  component="h3"
+  align="center"
+  sx={{ mb: 2, fontWeight: 'bold' }}
+>
+  Nombre total de cas guéris (par pays et maladie)
+</Typography>
+
       <Bar data={chartData} options={options} />
-    </div>
+    </Box>
   );
 };
 

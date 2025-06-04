@@ -38,7 +38,7 @@ const TotalDeathsChart = () => {
 
     const grouped = {};
     filtered.forEach((entry) => {
-      const country = entry.country?.name;
+      const country = entry.country?.name || 'Inconnu';
       const deaths = entry.totalDeaths || 0;
 
       if (!grouped[country]) grouped[country] = 0;
@@ -58,7 +58,7 @@ const TotalDeathsChart = () => {
         {
           label: selectedDisease,
           data: values,
-          backgroundColor: '#1976d2',
+          backgroundColor: '#003f5c', // Bleu foncé pour meilleur contraste
         },
       ],
     });
@@ -69,74 +69,117 @@ const TotalDeathsChart = () => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { position: 'top' },
+      legend: { 
+        position: 'top',
+        labels: {
+          color: '#000',
+          font: { weight: 'bold', size: 14 }
+        }
+      },
       title: {
         display: true,
         text: `Nombre total de morts par pays (${selectedDisease})`,
+        color: '#000',
+        font: { weight: 'bold', size: 16 }
       },
+      tooltip: {
+        bodyColor: '#000',
+        backgroundColor: '#fff',
+        borderColor: '#003f5c',
+        borderWidth: 1,
+      }
     },
+    scales: {
+      x: {
+        ticks: { color: '#000' },
+        grid: { color: '#ccc' }
+      },
+      y: {
+        ticks: { color: '#000' },
+        grid: { color: '#ccc' }
+      }
+    }
   };
 
-  const diseaseOptions = [...new Set(data.map((entry) => entry.disease?.name))];
+  const diseaseOptions = [...new Set(data.map((entry) => entry.disease?.name).filter(Boolean))];
 
   return (
-    <div>
-      <h3>Nombre total de morts par pays et par maladie</h3>
+    <section
+      role="region"
+      aria-labelledby="total-deaths-chart-title"
+      style={{ width: '100%', height: '100%', color: '#000' }}
+    >
+      <h3 id="total-deaths-chart-title">Nombre total de morts par pays et par maladie</h3>
       <FormControl
-  variant="outlined"
-  size="small"
-  sx={{
-    minWidth: 140,
-    mb: 2,
-    borderRadius: 3,
-    background: 'transparent',
-    boxShadow: 'none',
-  }}
->
-  <InputLabel
-    id="disease-select-label"
-    sx={{
-      borderRadius: 3,
-      background: 'rgba(25, 118, 210, 0.8)', // Bleu Material UI avec opacité
-      px: 1,
-      color: '#fff', // Texte en blanc
-    }}
-  >
-    Choisir une maladie
-  </InputLabel>
-  <Select
-    labelId="disease-select-label"
-    value={selectedDisease}
-    onChange={(e) => setSelectedDisease(e.target.value)}
-    label="Choisir une maladie"
-    sx={{
-      borderRadius: 3,
-      background: 'transparent',
-      color: '#fff', // Texte en blanc
-      fontWeight: 600,
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#1976d2', // Bleu Material UI
-        borderRadius: 3,
-      },
-      '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#1565c0', // Bleu plus foncé au hover
-      },
-      '& .MuiSvgIcon-root': {
-        color: '#1976d2',
-      },
-    }}
-  >
-    {diseaseOptions.map((disease) => (
-      <MenuItem key={disease} value={disease} sx={{ color: '#fff', background: 'transparent' }}>
-        {disease}
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
-      <div style={{ width: '700px', height: '400px', marginTop: '20px' }}>
-        {chartData ? <Bar data={chartData} options={options} /> : <p>Chargement des données...</p>}
+        variant="outlined"
+        size="small"
+        sx={{
+          minWidth: 180,
+          mb: 2,
+          borderRadius: 3,
+          background: 'transparent',
+          boxShadow: 'none',
+        }}
+      >
+        <InputLabel
+          id="disease-select-label"
+          sx={{
+            borderRadius: 3,
+            background: '#003f5c',
+            px: 1,
+            color: '#fff',
+          }}
+        >
+          Choisir une maladie
+        </InputLabel>
+        <Select
+          labelId="disease-select-label"
+          value={selectedDisease}
+          onChange={(e) => setSelectedDisease(e.target.value)}
+          label="Choisir une maladie"
+          sx={{
+            borderRadius: 3,
+            background: 'transparent',
+            color: '#003f5c',
+            fontWeight: 600,
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: '#003f5c',
+              borderRadius: 3,
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: '#002f4a',
+            },
+            '& .MuiSvgIcon-root': {
+              color: '#003f5c',
+            },
+          }}
+          inputProps={{ 'aria-describedby': 'disease-select-helper' }}
+        >
+          {diseaseOptions.map((disease) => (
+            <MenuItem
+              key={disease}
+              value={disease}
+              sx={{ color: '#003f5c', background: 'transparent' }}
+            >
+              {disease}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <div
+        style={{ width: '100%', height: 'calc(100% - 120px)' }}
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {chartData ? (
+          <Bar data={chartData} options={options} aria-label={`Graphique en barres montrant le nombre total de morts par pays pour ${selectedDisease}`} />
+        ) : (
+          <p>Chargement des données...</p>
+        )}
       </div>
-    </div>
+
+    </section>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
 import {
   Box,
   Container,
@@ -21,59 +22,72 @@ import {
 } from 'recharts';
 
 const countries = ['France', 'Germany', 'Italy', 'Spain', 'United States', 'India', 'Brazil'];
+const targetOptions = ['new_cases', 'new_deaths', 'new_recovered'];
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const PredictionForm = () => {
   const [country, setCountry] = useState('France');
   const [daysAhead, setDaysAhead] = useState(7);
+  const [targets, setTargets] = useState(['new_cases']);
   const [resultText, setResultText] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [error, setError] = useState(null);
   const [showGraph, setShowGraph] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePrediction = () => {
-    const url = `http://localhost:8000/api/v1/predict?target=new_cases&country_name=${country}&days_ahead=${daysAhead}`;
+    setIsLoading(true);
+    const url = `http://localhost:8000/api/v1/predict?country_name=${country}&days_ahead=${daysAhead}&targets=${targets.join(',')}`;
 
     fetch(url, {
       headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`
+        Accept: 'application/json',
+        Authorization: `Bearer ${API_KEY}`
       }
     })
-      .then((res) => {
-        if (!res.ok) throw new Error(`Erreur HTTP: ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        setImageUrl(data.image_path ? `http://localhost:8000/${data.image_path}` : null);
-        setResultText(JSON.stringify(data.predictions || data, null, 2));
-        setError(null);
-        setShowGraph(false);
-      })
-      .catch(() => {
-        setError('Erreur lors de la récupération de la prédiction.');
-        setResultText(null);
-        setImageUrl(null);
-        setShowGraph(false);
-      });
+        .then((res) => {
+          if (!res.ok) throw new Error(`Erreur HTTP: ${res.status}`);
+          return res.json();
+        })
+        .then((data) => {
+          setImageUrl(data.image_path ? `http://localhost:8000/${data.image_path}` : null);
+          setResultText(JSON.stringify(data.predictions || {}, null, 2)); // Optionnel si vous ne voulez pas afficher les données brutes
+          setError(null);
+          setShowGraph(true); // Affiche directement le graphique
+        })
+        .catch(() => {
+          setError('Erreur lors de la récupération de la prédiction.');
+          setImageUrl(null);
+          setShowGraph(false);
+        })
+        .finally(() => {
+          setIsLoading(false); // Arrête le loader
+        });
   };
 
   const parseChartData = () => {
+    if (!resultText) return [];
     try {
-      const data = JSON.parse(resultText);
-      return Object.entries(data).map(([key, value]) => ({
-        day: `Jour ${Number(key) + 1}`,
-        value: parseFloat(value.predicted_new_cases)
-      }));
+      const predsObj = JSON.parse(resultText);
+      const firstTarget = targets[0];
+      const length = predsObj[firstTarget]?.length || 0;
+      return Array.from({ length }, (_, i) => {
+        const dayObj = { day: `Jour ${i + 1}` };
+        targets.forEach((t) => {
+          const entry = (predsObj[t] || [])[i] || {};
+          dayObj[t] = parseFloat(entry[`predicted_${t}`] || 0);
+        });
+        return dayObj;
+      });
     } catch {
       return [];
     }
   };
 
   const chartData = parseChartData();
-  const values = chartData.map(d => d.value);
-  const minValue = Math.min(...values);
-  const maxValue = Math.max(...values);
+  const allValues = chartData.flatMap((d) => targets.map((t) => d[t] || 0));
+  const minValue = Math.min(...allValues, 0);
+  const maxValue = Math.max(...allValues, 1);
   const margin = (maxValue - minValue) * 0.1 || 0.0001;
 
   return (
@@ -113,27 +127,47 @@ const PredictionForm = () => {
             </Grid>
 
             <Grid item xs={12}>
+              <TextField
+                select
+                fullWidth
+                label="Cibles à prédire"
+                value={targets}
+                onChange={(e) =>
+                  setTargets(typeof e.target.value === 'string'
+                    ? e.target.value.split(',')
+                    : e.target.value
+                  )
+                }
+                SelectProps={{ multiple: true }}
+              >
+                {targetOptions.map((target) => (
+                  <MenuItem key={target} value={target}>
+                    {target}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12}>
               <Stack direction="row" spacing={2} justifyContent="center">
                 <Button
                   variant="contained"
                   color="primary"
                   onClick={handlePrediction}
                   sx={{ borderRadius: 2, px: 4, py: 1.5 }}
+                  disabled={isLoading}
                 >
-                  Lancer la prédiction
-                </Button>
-
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={() => setShowGraph(true)}
-                  sx={{ borderRadius: 2 }}
-                >
-                  Afficher le graphique
+                  {isLoading ? 'Chargement...' : 'Lancer la prédiction'}
                 </Button>
               </Stack>
             </Grid>
           </Grid>
+
+          {isLoading && (
+              <Box mt={3}>
+                <CircularProgress color="primary" />
+              </Box>
+          )}
 
           {error && (
             <Typography color="error" sx={{ mt: 3 }}>
@@ -141,28 +175,7 @@ const PredictionForm = () => {
             </Typography>
           )}
 
-          {resultText && (
-            <Box mt={4} textAlign="left">
-              <Typography variant="h6" fontWeight="medium" gutterBottom>
-                Résultat :
-              </Typography>
-              <Paper
-                sx={{
-                  backgroundColor: 'grey.900',
-                  color: 'common.white',
-                  padding: 2,
-                  borderRadius: 2,
-                  overflowX: 'auto',
-                }}
-              >
-                <pre style={{ color: 'inherit', whiteSpace: 'pre-wrap' }}>
-                  {resultText}
-                </pre>
-              </Paper>
-            </Box>
-          )}
-
-          {showGraph && (
+          {showGraph && chartData.length > 0 && (
             <Box mt={4}>
               <Typography variant="h6" fontWeight="medium" gutterBottom>
                 Graphique de la prédiction :
@@ -173,26 +186,35 @@ const PredictionForm = () => {
                   <XAxis dataKey="day" />
                   <YAxis domain={[minValue - margin, maxValue + margin]} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="value" stroke="#1976d2" strokeWidth={2} />
+                  {targets.map((target, idx) => (
+                    <Line
+                      key={target}
+                      type="monotone"
+                      dataKey={target}
+                      stroke={['#1976d2', '#d32f2f', '#2e7d32'][idx % 3]}
+                      strokeWidth={2}
+                    />
+                  ))}
                 </LineChart>
               </ResponsiveContainer>
 
               {imageUrl && (
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => {
-                    const link = document.createElement('a');
-                    link.href = imageUrl;
-                    link.download = `prediction_${country}_${daysAhead}j.png`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }}
-                  sx={{ mt: 2, borderRadius: 2 }}
-                >
-                  Télécharger le graphique
-                </Button>
+                <Box mt={2}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = imageUrl;
+                      link.download = `prediction_${country}_${daysAhead}j.png`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                  >
+                    Télécharger le graphique
+                  </Button>
+                </Box>
               )}
             </Box>
           )}

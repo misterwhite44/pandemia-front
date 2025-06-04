@@ -1,10 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 test('Le dashboard se charge avec les graphiques', async ({ page }) => {
-  await page.goto('/dashboard');
-  // Attend qu'au moins un canvas soit visible (pour Chart.js)
-  await expect(page.locator('canvas')).toHaveCount(1, { timeout: 10000 });
-  // Vérifie qu'il y a au moins un canvas (au cas où il y en aurait plusieurs)
+  await page.goto('/dashboard'); // ou la route exacte
+
+  await page.waitForSelector('canvas', { state: 'visible' });
+
+await expect(page.locator('text=Dashboard').first()).toBeVisible();
+
   const canvasCount = await page.locator('canvas').count();
   expect(canvasCount).toBeGreaterThan(0);
 });

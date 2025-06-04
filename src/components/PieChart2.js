@@ -9,6 +9,17 @@ const PieChart = () => {
 
   const options = {
     maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: '#000',
+          font: {
+            weight: 'bold',
+            size: 14,
+          },
+        },
+      },
+    },
   };
 
   useEffect(() => {
@@ -33,7 +44,13 @@ const PieChart = () => {
           datasets: [
             {
               data: values,
-              backgroundColor: ['#1976d2', '#f57c00', '#9c27b0', '#4caf50', '#e91e63'],
+              backgroundColor: [
+                '#003f5c', // Bleu foncé
+                '#58508d', // Violet
+                '#bc5090', // Rose foncé
+                '#ff6361', // Rouge orangé
+                '#ffa600'  // Jaune foncé
+              ],
             },
           ],
         });
@@ -44,11 +61,17 @@ const PieChart = () => {
   if (!chartData) return <p>Chargement des données...</p>;
 
   return (
-    <div>
-      <h3>Pays les plus touchés par le Monkeypox</h3>
+    <div
+      role="region"
+      aria-labelledby="chart-monkeypox-title"
+      style={{ color: '#000' }}
+    >
+      <h3 id="chart-monkeypox-title">Pays les plus touchés par le Monkeypox</h3>
       <div style={{ width: '300px', height: '300px' }}>
-        <Pie data={chartData} options={options} />
+        <Pie data={chartData} options={options} aria-label="Diagramme circulaire des cas Monkeypox par pays" />
       </div>
+
+
     </div>
   );
 };

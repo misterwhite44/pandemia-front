@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # nécessaire pour SonarCloud
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -34,7 +36,7 @@ jobs:
           npm install -g serve
           serve -s build -l 3000 &
           sleep 10
-       
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
@@ -57,8 +59,3 @@ jobs:
           target: 'http://localhost:3000'
           fail_action: true
         continue-on-error: true
-
-        # ...existing code...
-
-
-

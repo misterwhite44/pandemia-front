@@ -44,7 +44,7 @@ jobs:
               -r zap-report.html
 
       - name: Upload OWASP ZAP Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: zap-report
           path: zap-report.html

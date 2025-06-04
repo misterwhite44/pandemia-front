@@ -5,10 +5,14 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:3000',
   },
+  // Retire la section webServer si tu démarres déjà le serveur dans le workflow CI/CD
+  // Sinon, décommente et adapte la commande ci-dessous si tu veux que Playwright gère le serveur
+  /*
   webServer: {
-    command: 'npm run dev', // ou 'yarn dev' selon ton gestionnaire
+    command: 'serve -s build -l 3000', // ou 'npm run dev' si tu utilises un serveur de dev
     port: 3000,
     timeout: 120 * 1000,
-    reuseExistingServer: !process.env.CI, // évite de relancer si déjà démarré en local
+    reuseExistingServer: !process.env.CI,
   },
+  */
 });

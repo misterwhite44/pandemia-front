@@ -25,6 +25,16 @@ jobs:
       - name: Build React app
         run: npm run build
 
+      - name: Start the app in background
+        run: |
+          npm start &
+          sleep 10 # attends que le serveur démarre (ajuste selon besoin)
+
+      - name: Run OWASP ZAP scan
+        uses: zaproxy/action-full-scan@v0.9.0
+        with:
+          target: 'http://localhost:3000'
+
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 

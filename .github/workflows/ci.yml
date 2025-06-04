@@ -29,6 +29,15 @@ jobs:
       - name: Build React app
         run: npm run build
 
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          projectBaseDir: .
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: 729f8ab3c05e1add60214eb1f328a35ab45c368e
+          SONAR_ORGANIZATION: Tomate
+
       - name: Start the app in background
         run: |
           npm install -g serve
@@ -48,16 +57,3 @@ jobs:
           target: 'http://localhost:3000'
           fail_action: true
         continue-on-error: true
-
-        # ...existing code...
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
-        with:
-          projectBaseDir: .
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: <votre_project_key>
-          SONAR_ORGANIZATION: <votre_organisation>
-
-# ...existing code...

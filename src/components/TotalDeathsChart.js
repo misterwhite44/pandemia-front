@@ -105,7 +105,6 @@ const TotalDeathsChart = () => {
 
   return (
     <section
-      role="region"
       aria-labelledby="total-deaths-chart-title"
       style={{ width: '100%', height: '100%', color: '#000' }}
     >

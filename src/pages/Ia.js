@@ -22,7 +22,11 @@ import {
 } from 'recharts';
 
 const countries = ['France', 'Germany', 'Italy', 'Spain', 'United States', 'India', 'Brazil'];
-const targetOptions = ['new_cases', 'new_deaths', 'new_recovered'];
+const targetOptions = [
+  { value: 'new_cases', label: 'Nouveaux cas' },
+  { value: 'new_deaths', label: 'Nouveaux décès' },
+  { value: 'new_recovered', label: 'Nouveaux guéris' }
+];
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const PredictionForm = () => {
@@ -30,14 +34,14 @@ const PredictionForm = () => {
   const [daysAhead, setDaysAhead] = useState(7);
   const [targets, setTargets] = useState(['new_cases']);
   const [resultText, setResultText] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null);
+  const [metrics, setMetrics] = useState({});
   const [error, setError] = useState(null);
   const [showGraph, setShowGraph] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePrediction = () => {
     setIsLoading(true);
-    const url = `http://localhost:8000/api/v1/predict?country_name=${country}&days_ahead=${daysAhead}&targets=${targets.join(',')}`;
+    const url = `http://localhost:8000/api/v1/predict?country=${country}&days=${daysAhead}&targets=${targets.join(',')}`;
 
     fetch(url, {
       headers: {
@@ -50,14 +54,14 @@ const PredictionForm = () => {
           return res.json();
         })
         .then((data) => {
-          setImageUrl(data.image_path ? `http://localhost:8000/${data.image_path}` : null);
-          setResultText(JSON.stringify(data.predictions || {}, null, 2)); // Optionnel si vous ne voulez pas afficher les données brutes
+          setResultText(JSON.stringify(data.predictions || {}, null, 2));
+          setMetrics(data.metrics || {}); // Stocke les métriques
           setError(null);
-          setShowGraph(true); // Affiche directement le graphique
+          setShowGraph(true);
         })
         .catch(() => {
           setError('Erreur lors de la récupération de la prédiction.');
-          setImageUrl(null);
+          setMetrics({});
           setShowGraph(false);
         })
         .finally(() => {
@@ -66,26 +70,28 @@ const PredictionForm = () => {
   };
 
   const parseChartData = () => {
-    if (!resultText) return [];
+    if (!resultText) return { new_cases: [], new_deaths: [], new_recovered: [] };
     try {
       const predsObj = JSON.parse(resultText);
-      const firstTarget = targets[0];
-      const length = predsObj[firstTarget]?.length || 0;
-      return Array.from({ length }, (_, i) => {
-        const dayObj = { day: `Jour ${i + 1}` };
-        targets.forEach((t) => {
-          const entry = (predsObj[t] || [])[i] || {};
-          dayObj[t] = parseFloat(entry[`predicted_${t}`] || 0);
-        });
-        return dayObj;
+      const chartData = {};
+
+      targets.forEach((target) => {
+        chartData[target] = predsObj[target]?.slice(0, daysAhead).map((entry, i) => ({
+          day: `Jour ${i + 1}`,
+          value: parseFloat(entry[`predicted_${target}`] || 0),
+        })) || [];
       });
+
+      return chartData;
     } catch {
-      return [];
+      return { new_cases: [], new_deaths: [], new_recovered: [] };
     }
   };
 
   const chartData = parseChartData();
-  const allValues = chartData.flatMap((d) => targets.map((t) => d[t] || 0));
+  const allValues = Object.values(chartData)
+      .flat()
+      .map((entry) => entry.value || 0);
   const minValue = Math.min(...allValues, 0);
   const maxValue = Math.max(...allValues, 1);
   const margin = (maxValue - minValue) * 0.1 || 0.0001;
@@ -122,7 +128,7 @@ const PredictionForm = () => {
                 label="Nombre de jours à prévoir"
                 value={daysAhead}
                 onChange={(e) => setDaysAhead(Number(e.target.value))}
-                inputProps={{ min: 1 }}
+                inputProps={{ min: 1, max: 30 }}
               />
             </Grid>
 
@@ -141,9 +147,9 @@ const PredictionForm = () => {
                 SelectProps={{ multiple: true }}
               >
                 {targetOptions.map((target) => (
-                  <MenuItem key={target} value={target}>
-                    {target}
-                  </MenuItem>
+                    <MenuItem key={target.value} value={target.value}>
+                      {target.label}
+                    </MenuItem>
                 ))}
               </TextField>
             </Grid>
@@ -175,48 +181,43 @@ const PredictionForm = () => {
             </Typography>
           )}
 
-          {showGraph && chartData.length > 0 && (
-            <Box mt={4}>
-              <Typography variant="h6" fontWeight="medium" gutterBottom>
-                Graphique de la prédiction :
-              </Typography>
-              <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
-                  <YAxis domain={[minValue - margin, maxValue + margin]} />
-                  <Tooltip />
-                  {targets.map((target, idx) => (
-                    <Line
-                      key={target}
-                      type="monotone"
-                      dataKey={target}
-                      stroke={['#1976d2', '#d32f2f', '#2e7d32'][idx % 3]}
-                      strokeWidth={2}
-                    />
-                  ))}
-                </LineChart>
-              </ResponsiveContainer>
-
-              {imageUrl && (
-                <Box mt={2}>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => {
-                      const link = document.createElement('a');
-                      link.href = imageUrl;
-                      link.download = `prediction_${country}_${daysAhead}j.png`;
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }}
-                  >
-                    Télécharger le graphique
-                  </Button>
-                </Box>
-              )}
-            </Box>
+          {showGraph && Object.keys(chartData).length > 0 && (
+              <Box mt={4}>
+                {targets.map((target, idx) => (
+                    <Box key={target} mt={4}>
+                      <Typography variant="h6" fontWeight="medium" gutterBottom>
+                        Graphique de la prédiction : {targetOptions.find((t) => t.value === target)?.label}
+                      </Typography>
+                      <ResponsiveContainer width="100%" height={400}>
+                        <LineChart data={chartData[target]}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="day" />
+                          <YAxis />
+                          <Tooltip />
+                          <Line
+                              type="monotone"
+                              dataKey="value"
+                              stroke={['#1976d2', '#d32f2f', '#2e7d32'][idx % 3]}
+                              strokeWidth={2}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                      {metrics[target] && (
+                          <Box mt={2}>
+                            <Typography variant="body1">
+                              <strong>MAE :</strong> {metrics[target].MAE.toFixed(2)}
+                            </Typography>
+                            <Typography variant="body1">
+                              <strong>RMSE :</strong> {metrics[target].RMSE.toFixed(2)}
+                            </Typography>
+                            <Typography variant="body1">
+                              <strong>R² :</strong> {metrics[target].R2.toFixed(2)}
+                            </Typography>
+                          </Box>
+                      )}
+                    </Box>
+                ))}
+              </Box>
           )}
         </Paper>
       </Container>

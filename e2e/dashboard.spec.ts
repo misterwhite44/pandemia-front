@@ -5,7 +5,7 @@ test('Le dashboard se charge avec les graphiques', async ({ page }) => {
 
   await page.waitForSelector('canvas', { state: 'visible' });
 
-await expect(page.locator('text=Dashboard').first()).toBeVisible();
+  await expect(page.locator('text=Dashboard').first()).toBeVisible();
 
   const canvasCount = await page.locator('canvas').count();
   expect(canvasCount).toBeGreaterThan(0);

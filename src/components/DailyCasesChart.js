@@ -21,7 +21,7 @@ const DailyCasesChart = () => {
   const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:8080/globaldata')
+    fetch('/api/globaldata')
       .then((res) => res.json())
       .then((fetchedData) => {
         if (!Array.isArray(fetchedData)) {

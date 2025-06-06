@@ -23,7 +23,7 @@ const PieChart = () => {
   };
 
   useEffect(() => {
-    fetch('http://localhost:8080/globaldata')
+    fetch('/api/globaldata')
       .then((res) => res.json())
       .then((data) => {
         if (!Array.isArray(data)) {

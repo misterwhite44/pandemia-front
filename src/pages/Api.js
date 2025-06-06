@@ -20,19 +20,19 @@ const Api = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const continentsResponse = await axios.get('http://localhost:8080/continents');
+        const continentsResponse = await axios.get('/api/continents');
         setContinents(continentsResponse.data);
 
-        const countriesResponse = await axios.get('http://localhost:8080/countries');
+        const countriesResponse = await axios.get('/api/countries');
         setCountries(countriesResponse.data);
 
-        const globalDataResponse = await axios.get('http://localhost:8080/globaldata');
+        const globalDataResponse = await axios.get('/api/globaldata');
         setGlobalData(globalDataResponse.data);
 
-        const regionsResponse = await axios.get('http://localhost:8080/regions');
+        const regionsResponse = await axios.get('/api/regions');
         setRegions(regionsResponse.data);
 
-        const diseasesResponse = await axios.get('http://localhost:8080/diseases');
+        const diseasesResponse = await axios.get('/api/diseases');
         setDiseases(diseasesResponse.data);
       } catch (err) {
         console.error('Erreur lors du chargement des données :', err);

@@ -41,7 +41,7 @@ const PredictionForm = () => {
 
   const handlePrediction = () => {
     setIsLoading(true);
-    const url = `http://localhost:8000/api/v1/predict?country=${country}&days=${daysAhead}&targets=${targets.join(',')}`;
+    const url = `/IAPI/api/v1/predict?country_name=${country}&days_ahead=${daysAhead}&targets=${targets.join(',')}`;
 
     fetch(url, {
       headers: {

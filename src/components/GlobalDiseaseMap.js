@@ -198,7 +198,7 @@ const GlobalDiseaseMap = () => {
   const [locations, setLocations] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:8081/globaldata')
+    fetch('/api/globaldata')
       .then((res) => res.json())
       .then((data) => {
         const filtered = data.filter(
